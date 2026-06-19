@@ -152,26 +152,6 @@ const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent
         </a>
 
         <button
-          id="btn-native-share"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-canvas-subtle)] border border-[var(--color-border-muted)] text-[var(--color-fg)] text-xs font-semibold hover:bg-[var(--color-canvas-inset)] transition-all active:scale-95"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="w-3.5 h-3.5"
-          >
-            <circle cx="18" cy="5" r="3"></circle>
-            <circle cx="6" cy="12" r="3"></circle>
-            <circle cx="18" cy="19" r="3"></circle>
-            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"></path>
-          </svg>
-          Bagikan
-        </button>
-
-        <button
           id="btn-copy-link"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-canvas-subtle)] border border-[var(--color-border-muted)] text-[var(--color-fg)] text-xs font-semibold hover:bg-[var(--color-canvas-inset)] transition-all active:scale-95"
         >
@@ -212,17 +192,6 @@ const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent
 <script>
   const pageUrl = window.location.href;
   const albumName = document.querySelector("h1")?.textContent?.trim() ?? "";
-
-  const btnShare = document.getElementById("btn-native-share");
-  if (!navigator.share) {
-    btnShare?.classList.add("hidden");
-  } else {
-    btnShare?.addEventListener("click", async () => {
-      try {
-        await navigator.share({ title: albumName, url: pageUrl });
-      } catch {}
-    });
-  }
 
   const btnCopy = document.getElementById("btn-copy-link");
   const iconCopy = document.getElementById("icon-copy");

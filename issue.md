@@ -23,12 +23,18 @@
 - Caching data Agar Cepat ketika load gambar 
 - Glassmorphism
 - Tampilkan hanya Album yang dishare ke publik
-- Jangan Pernah Ambil data Album yang mengandung nama "UNGGAH DOKUMENTASI" (Belum Implementasi)
-- Asset/Berkas Dokumentasi di slider mengambil semua data yang di publish (Publik/Dishare dari API) (Belum Implementasi)
-- Tambahkan Tombol Bagikan (Ke Instagram, Ke Facebook dan ke Whatsapp) (Belum Implement)
-- Title dan nama instansi (ROHIS & SMKN 1 PANDEGLANG) pindahkan ke .env agar dinamis untuk project lainnya (Belum Implementasi)
+- Jangan Pernah Ambil data Album yang mengandung nama "UNGGAH DOKUMENTASI"
+- Asset/Berkas Dokumentasi di slider mengambil semua data yang di publish (Publik/Dishare dari API)
+- Tambahkan Tombol Bagikan (Ke Facebook dan ke Whatsapp)
+- Title dan nama instansi (ROHIS & SMKN 1 PANDEGLANG) pindahkan ke .env agar dinamis untuk project lainnya
 
 ## Catatan
 - untuk font dan tampilan warna tema saya suka (sudah pas)
+
+## Issue
+- Perbaiki Tombol Home dan Album pada tampilan Smartphone (Tidak Bisa diklik)
+- Tambahkan Fungsi Toggle Hidden Sidebar
+- Tampilkan hanya logo pada saat sidebar dihidden
+- Tampilkan hanya satu Brand Logo dan Site Name / Site Shortname baik pada tampilan desktop dan Smartphone
 
 finalkan project ini!

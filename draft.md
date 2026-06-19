@@ -7,7 +7,7 @@ IMMICH_BASE_URL=https://galeri-rohis.zedlabs.id
 IMMICH_API_KEY=NUaPrJHlmuJJQAiaOWgXgKl2grOR2PzX9pnotGw
 
 SITE_NAME=DOKUMENTASI ROHIS
-SITE_SHORT_NAME=ROHIS
+SITE_SHORT_NAME=DOKUMENTASI ROHIS
 SITE_DESCRIPTION=Dokumentasi kegiatan dalam satu tempat.
 ORG_NAME=ROHIS
 SCHOOL_NAME=SMKN 1 PANDEGLANG
@@ -55,6 +55,7 @@ export default defineConfig({
     "@astrojs/node": "^10.1.4",
     "astro": "^6.4.8",
     "dotenv": "^17.4.2",
+    "sharp": "^0.35.1",
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
@@ -69,6 +70,7 @@ export default defineConfig({
 
 ```yaml
 allowBuilds:
+  canvas: set this to true or false
   esbuild: true
   sharp: true
 
@@ -159,58 +161,42 @@ self.addEventListener("fetch", (e) => {
 ### File: `./scripts/gen-icon.mjs`
 
 ```javascript
-import { createCanvas } from "canvas";
+import sharp from "sharp";
 import { writeFileSync, mkdirSync } from "fs";
 
 mkdirSync("public/icons", { recursive: true });
 
-function draw(size) {
-    const c = createCanvas(size, size);
-    const ctx = c.getContext("2d");
-    const r = size * 0.25;
-
-    ctx.fillStyle = "#0969da";
-    roundRect(ctx, 0, 0, size, size, size * 0.2);
-    ctx.fill();
-
+function generateSVG(size) {
+    const r = size * 0.2;
     const pad = size * 0.14;
     const gap = size * 0.06;
     const half = (size - pad * 2 - gap) / 2;
+    const innerR = size * 0.06;
 
-    const cells = [
-        [pad, pad, half, half, 1],
-        [pad + half + gap, pad, half, half, 0.7],
-        [pad, pad + half + gap, half, half, 0.7],
-        [pad + half + gap, pad + half + gap, half, half, 0.5],
-    ];
-
-    for (const [x, y, w, h, alpha] of cells) {
-        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-        roundRect(ctx, x, y, w, h, size * 0.06);
-        ctx.fill();
-    }
-
-    return c.toBuffer("image/png");
+    return `
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="${size}" height="${size}" rx="${r}" fill="#0969da" />
+        
+        <rect x="${pad}" y="${pad}" width="${half}" height="${half}" rx="${innerR}" fill="rgba(255,255,255,1)" />
+        <rect x="${pad + half + gap}" y="${pad}" width="${half}" height="${half}" rx="${innerR}" fill="rgba(255,255,255,0.7)" />
+        <rect x="${pad}" y="${pad + half + gap}" width="${half}" height="${half}" rx="${innerR}" fill="rgba(255,255,255,0.7)" />
+        <rect x="${pad + half + gap}" y="${pad + half + gap}" width="${half}" height="${half}" rx="${innerR}" fill="rgba(255,255,255,0.5)" />
+    </svg>
+    `;
 }
 
-function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+async function createIcons() {
+    const svg192 = Buffer.from(generateSVG(192));
+    const svg512 = Buffer.from(generateSVG(512));
+
+    await sharp(svg192).png().toFile("public/icons/icon-192.png");
+    await sharp(svg512).png().toFile("public/icons/icon-512.png");
+    await sharp(svg512).png().toFile("public/og.png");
+
+    console.log("🚀 Icons successfully generated via sharp!");
 }
 
-writeFileSync("public/icons/icon-192.png", draw(192));
-writeFileSync("public/icons/icon-512.png", draw(512));
-writeFileSync("public/og.png", draw(512));
-console.log("Icons generated.");
+createIcons().catch(console.error);
 ```
 
 ---
@@ -963,24 +949,6 @@ const year = new Date().getFullYear();
           </a>
 
           <div class="flex items-center gap-2">
-            <a
-              href="/albums"
-              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)] transition-colors border border-transparent hover:border-[var(--color-border-muted)]"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="w-3.5 h-3.5"
-              >
-                <path
-                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
-                ></path>
-              </svg>
-              Album
-            </a>
             <button
               id="theme-toggle"
               type="button"
@@ -1482,26 +1450,6 @@ const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent
         </a>
 
         <button
-          id="btn-native-share"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-canvas-subtle)] border border-[var(--color-border-muted)] text-[var(--color-fg)] text-xs font-semibold hover:bg-[var(--color-canvas-inset)] transition-all active:scale-95"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="w-3.5 h-3.5"
-          >
-            <circle cx="18" cy="5" r="3"></circle>
-            <circle cx="6" cy="12" r="3"></circle>
-            <circle cx="18" cy="19" r="3"></circle>
-            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"></path>
-          </svg>
-          Bagikan
-        </button>
-
-        <button
           id="btn-copy-link"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-canvas-subtle)] border border-[var(--color-border-muted)] text-[var(--color-fg)] text-xs font-semibold hover:bg-[var(--color-canvas-inset)] transition-all active:scale-95"
         >
@@ -1542,17 +1490,6 @@ const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent
 <script>
   const pageUrl = window.location.href;
   const albumName = document.querySelector("h1")?.textContent?.trim() ?? "";
-
-  const btnShare = document.getElementById("btn-native-share");
-  if (!navigator.share) {
-    btnShare?.classList.add("hidden");
-  } else {
-    btnShare?.addEventListener("click", async () => {
-      try {
-        await navigator.share({ title: albumName, url: pageUrl });
-      } catch {}
-    });
-  }
 
   const btnCopy = document.getElementById("btn-copy-link");
   const iconCopy = document.getElementById("icon-copy");
