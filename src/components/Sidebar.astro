@@ -30,21 +30,9 @@ const isAlbumPage = currentPath.startsWith("/albums/");
       class="flex items-center gap-2 font-semibold tracking-tight text-[var(--color-fg)] text-sm min-w-0"
     >
       <span
-        class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+        class="inline-flex items-center justify-center w-7 h-7 rounded-lg border border-[var(--color-border)] shrink-0 overflow-hidden p-1"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="white"
-          stroke-width="2"
-          class="w-3.5 h-3.5"
-        >
-          <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-          <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-          <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-          <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-        </svg>
+        <img src="/favicon.svg" class="w-full h-full object-contain" />
       </span>
       <span class="sb-label leading-tight truncate">{SITE_NAME}</span>
     </a>

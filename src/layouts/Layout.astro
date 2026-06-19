@@ -71,104 +71,6 @@ const year = new Date().getFullYear();
     <slot name="sidebar" />
 
     <div id="app-content" class="flex flex-col min-h-screen">
-      <!-- <header
-        class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-5 h-14 border-b border-[var(--glass-border)] shrink-0"
-      >
-        <div class="flex items-center gap-3">
-          <button
-            id="sidebar-toggle"
-            type="button"
-            aria-label="Toggle sidebar"
-            class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200 shrink-0"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              class="w-4 h-4 sidebar-icon-open"
-            >
-              <rect x="3" y="3" width="7" height="18" rx="1.5" opacity="0.3"
-              ></rect>
-              <line x1="14" y1="7" x2="21" y2="7"></line>
-              <line x1="14" y1="12" x2="21" y2="12"></line>
-              <line x1="14" y1="17" x2="21" y2="17"></line>
-            </svg>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              class="w-4 h-4 sidebar-icon-closed hidden"
-            >
-              <rect x="14" y="3" width="7" height="18" rx="1.5" opacity="0.3"
-              ></rect>
-              <line x1="3" y1="7" x2="10" y2="7"></line>
-              <line x1="3" y1="12" x2="10" y2="12"></line>
-              <line x1="3" y1="17" x2="10" y2="17"></line>
-            </svg>
-          </button>
-
-          <a
-            href="/"
-            class="lg:hidden flex items-center gap-2.5 font-semibold tracking-tight text-[var(--color-fg)] text-sm"
-          >
-            <span
-              class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                stroke-width="2"
-                class="w-3.5 h-3.5"
-              >
-                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-              </svg>
-            </span>
-            <span class="leading-tight truncate max-w-[160px] sm:max-w-xs"
-              >{SITE_SHORT_NAME}</span
-            >
-          </a>
-        </div>
-
-        <button
-          id="theme-toggle"
-          type="button"
-          aria-label="Ganti tema"
-          class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="w-4 h-4 hidden dark:block"
-          >
-            <circle cx="12" cy="12" r="4"></circle>
-            <path
-              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
-            ></path>
-          </svg>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="w-4 h-4 block dark:hidden"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </button>
-      </header> -->
       <header
         class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-5 h-14 border-b border-[var(--glass-border)] shrink-0"
       >
@@ -214,21 +116,9 @@ const year = new Date().getFullYear();
           tracking-tight text-[var(--color-fg)] text-sm"
           >
             <span
-              class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+              class="inline-flex items-center justify-center w-7 h-7 rounded-lg border border-[var(--color-border)] shrink-0 overflow-hidden p-1"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                stroke-width="2"
-                class="w-3.5 h-3.5"
-              >
-                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-              </svg>
+              <img src="/favicon.svg" class="w-full h-full object-contain" />
             </span>
             <span class="leading-tight truncate max-w-[160px] sm:max-w-xs"
               >{SITE_SHORT_NAME}</span
