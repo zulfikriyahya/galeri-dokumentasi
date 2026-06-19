@@ -49,9 +49,9 @@ echo ""
 
 # ── Konfigurasi awal ────────────────────────────────────────────
 info "Konfigurasi Aplikasi"
-APP_NAME=$(ask "Nama aplikasi" "dokumentasi-rohis")
+APP_NAME=$(ask "Nama aplikasi" "galeri-dokumentasi")
 APP_DIR="/var/www/$APP_NAME"
-REPO_URL=$(ask "URL repository Git" "https://github.com/zulfikriyahya/dokumentasi-rohis")
+REPO_URL=$(ask "URL repository Git" "https://github.com/zulfikriyahya/galeri-dokumentasi")
 BRANCH=$(ask "Branch" "main")
 PORT=$(ask "Port aplikasi" "4321")
 
@@ -102,9 +102,9 @@ else
 fi
 
 if ! command -v node &>/dev/null; then
-  info "Install Node.js 22..."
+  info "Install Node.js 26..."
   apt install -y curl
-  curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  curl -fsSL https://deb.nodesource.com/setup_26.x | bash -
   apt install -y nodejs
   success "Node.js terinstall: $(node -v)"
 else
