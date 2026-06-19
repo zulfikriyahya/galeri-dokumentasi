@@ -1,19 +1,19 @@
 server {
     listen 80;
-    server_name rohis.zedlabs.id;
+    server_name dokumentasi.mtsn1pandeglang.sch.id;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name rohis.zedlabs.id;
+    server_name dokumentasi.mtsn1pandeglang.sch.id;
 
     gzip on;
     gzip_types text/plain text/css application/javascript application/json image/svg+xml;
     gzip_min_length 1024;
 
     location / {
-        proxy_pass http://127.0.0.1:4321;
+        proxy_pass http://127.0.0.1:4322;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -25,13 +25,13 @@ server {
     }
 
     location ~* \.(ico|svg|png|jpg|jpeg|webp|woff2|woff|ttf)$ {
-        proxy_pass http://127.0.0.1:4321;
+        proxy_pass http://127.0.0.1:4322;
         proxy_cache_valid 200 30d;
         add_header Cache-Control "public, max-age=2592000, immutable";
     }
 
     location ~* \.(css|js)$ {
-        proxy_pass http://127.0.0.1:4321;
+        proxy_pass http://127.0.0.1:4322;
         add_header Cache-Control "public, max-age=31536000, immutable";
     }
 }

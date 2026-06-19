@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: "dokumentasi-rohis",
+            name: "dokumentasi-madrasah",
             script: "./dist/server/entry.mjs",
             interpreter: "node",
             instances: 1,
@@ -11,7 +11,7 @@ module.exports = {
             env: {
                 NODE_ENV: "production",
                 HOST: "0.0.0.0",
-                PORT: 4321,
+                PORT: 4322,
             },
         },
     ],
