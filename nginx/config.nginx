@@ -8,11 +8,6 @@ server {
     listen 443 ssl;
     server_name rohis.zedlabs.id;
 
-    ssl_certificate /etc/letsencrypt/live/rohis.zedlabs.id/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/rohis.zedlabs.id/privkey.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-
     gzip on;
     gzip_types text/plain text/css application/javascript application/json image/svg+xml;
     gzip_min_length 1024;
