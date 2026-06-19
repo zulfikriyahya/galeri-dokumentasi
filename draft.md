@@ -708,23 +708,26 @@ interface Props {
   albums: ImmichAlbum[];
   activeId?: string;
 }
+const SITE_NAME = import.meta.env.SITE_NAME ?? "GALERI DOKUMENTASI";
+const SITE_SHORT_NAME = import.meta.env.SITE_SHORT_NAME ?? "DOKUMENTASI";
 
 const { albums, activeId } = Astro.props;
 const groups = groupAlbumsByYear(albums);
-const SITE_NAME = import.meta.env.SITE_NAME ?? "DOKUMENTASI";
-const siteParts = SITE_NAME.split(" ");
-const siteNameLine1 = siteParts[0] ?? SITE_NAME;
-const siteNameLine2 = siteParts.slice(1).join(" ");
 const currentPath = Astro.url.pathname;
+const isHome = currentPath === "/";
+const isAlbums = currentPath === "/albums";
+const isAlbumPage = currentPath.startsWith("/albums/");
 ---
 
 <aside
-  class="lg:w-60 xl:w-64 lg:shrink-0 lg:border-r lg:border-[var(--color-border-muted)] lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto lg:flex lg:flex-col glass"
+  id="app-sidebar"
+  class="hidden lg:flex fixed top-0 left-0 h-screen flex-col z-40 glass border-r border-[var(--glass-border)] overflow-hidden"
+  aria-label="Sidebar navigasi"
 >
   <div
-    class="hidden lg:flex items-center gap-2.5 px-4 py-4 border-b border-[var(--glass-border)] shrink-0"
+    class="flex items-center h-14 px-3 border-b border-[var(--glass-border)] shrink-0 gap-2 overflow-hidden"
   >
-    <span
+    <!-- <span
       class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
     >
       <svg
@@ -741,71 +744,114 @@ const currentPath = Astro.url.pathname;
         <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
       </svg>
     </span>
+    <span
+      class="sb-label text-xs font-semibold text-[var(--color-fg-subtle)] uppercase tracking-widest truncate whitespace-nowrap"
+    >
+      Navigasi
+    </span> -->
     <a
       href="/"
-      class="font-semibold tracking-tight text-[var(--color-fg)] text-sm leading-tight"
+      class="flex items-center gap-2 font-semibold tracking-tight text-[var(--color-fg)] text-sm"
     >
-      {siteNameLine1}<br />{siteNameLine2}
+      <span
+        class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          stroke-width="2"
+          class="w-3.5 h-3.5"
+        >
+          <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+        </svg>
+      </span>
+      <span class="hidden sm:block leading-tight">{SITE_NAME}</span>
+      <span class="sm:hidden leading-tight">{SITE_SHORT_NAME}</span>
     </a>
   </div>
 
-  <div class="hidden lg:block flex-1 overflow-y-auto">
-    <div class="px-3 pt-3 pb-1">
-      <a
-        href="/"
-        class={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors mb-1 ${currentPath === "/" ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)]" : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]"}`}
+  <div class="px-2 pt-2.5 pb-1 space-y-0.5 shrink-0">
+    <a
+      href="/"
+      class:list={[
+        "sb-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors",
+        isHome
+          ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)]"
+          : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]",
+      ]}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        class="w-4 h-4 shrink-0"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          class="w-4 h-4 shrink-0"
-        >
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-        </svg>
-        Beranda
-      </a>
-      <a
-        href="/albums"
-        class={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors mb-3 ${currentPath === "/albums" ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)]" : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]"}`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          class="w-4 h-4 shrink-0"
-        >
-          <path
-            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
-          ></path>
-        </svg>
-        Semua Album
-      </a>
-    </div>
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span class="sb-label">Beranda</span>
+    </a>
 
-    <div class="px-3 pb-4 space-y-5">
+    <a
+      href="/albums"
+      class:list={[
+        "sb-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors",
+        isAlbums || isAlbumPage
+          ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)]"
+          : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]",
+      ]}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        class="w-4 h-4 shrink-0"
+      >
+        <path
+          d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+        ></path>
+      </svg>
+      <span class="sb-label">Semua Album</span>
+    </a>
+  </div>
+
+  <div class="sb-expanded flex-1 overflow-y-auto px-2 pb-4">
+    <div class="space-y-4 pt-2">
       {
         groups.map((group) => (
           <div>
-            <p class="px-2.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-fg-subtle)] mb-1.5 flex items-center gap-1.5">
-              <span class="w-3 h-px bg-[var(--color-border)] inline-block" />
+            <p class="px-2.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-fg-subtle)] mb-1.5 flex items-center gap-1.5 whitespace-nowrap overflow-hidden">
+              <span class="w-3 h-px bg-[var(--color-border)] inline-block shrink-0" />
               {group.year}
             </p>
             <ul class="space-y-0.5">
               {group.albums.map((album) => {
-                const isActive = activeId === album.id;
+                const active = activeId === album.id;
                 return (
                   <li>
                     <a
                       href={`/albums/${album.id}`}
-                      class={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-sm truncate transition-colors group ${isActive ? "bg-[var(--color-accent)] text-white font-medium shadow-sm" : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]"}`}
+                      class:list={[
+                        "flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-sm truncate transition-colors group",
+                        active
+                          ? "bg-[var(--color-accent)] text-white font-medium shadow-sm"
+                          : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]",
+                      ]}
                     >
                       <span
-                        class={`w-1.5 h-1.5 rounded-full shrink-0 ${isActive ? "bg-white/60" : "bg-[var(--color-border)]"}`}
+                        class:list={[
+                          "w-1.5 h-1.5 rounded-full shrink-0",
+                          active ? "bg-white/60" : "bg-[var(--color-border)]",
+                        ]}
                       />
                       <span class="truncate">{album.albumName}</span>
                     </a>
@@ -910,112 +956,48 @@ const year = new Date().getFullYear();
         var d = matchMedia("(prefers-color-scheme: dark)").matches;
         if ((s ?? (d ? "dark" : "light")) === "dark")
           document.documentElement.classList.add("dark");
+        if (localStorage.getItem("sb-collapsed") === "1")
+          document.body.classList.add("sb-collapsed");
       })();
     </script>
   </head>
+
   <body
     class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen antialiased"
   >
-    <div class="lg:flex min-h-screen">
-      <slot name="sidebar" />
+    <slot name="sidebar" />
 
-      <div class="flex-1 min-w-0 flex flex-col">
-        <header
-          class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 h-14 border-b border-[var(--glass-border)]"
-        >
-          <a
-            href="/"
-            class="font-semibold tracking-tight text-[var(--color-fg)] text-sm flex items-center gap-2.5"
+    <div id="app-content" class="flex flex-col min-h-screen">
+      <header
+        class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-5 h-14 border-b border-[var(--glass-border)] shrink-0"
+      >
+        <div class="flex items-center gap-2">
+          <button
+            id="sidebar-toggle"
+            type="button"
+            aria-label="Toggle sidebar"
+            class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200 shrink-0"
           >
-            <span
-              class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                stroke-width="2"
-                class="w-3.5 h-3.5"
-              >
-                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-              </svg>
-            </span>
-            <span class="hidden sm:block">{SITE_NAME}</span>
-            <span class="block sm:hidden">{SITE_SHORT_NAME}</span>
-          </a>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
 
-          <div class="flex items-center gap-2">
-            <button
-              id="theme-toggle"
-              type="button"
-              aria-label="Ganti tema"
-              class="p-2 rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="w-4 h-4 hidden dark:block"
-              >
-                <circle cx="12" cy="12" r="4"></circle>
-                <path
-                  d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
-                ></path>
-              </svg>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="w-4 h-4 block dark:hidden"
-              >
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-                ></path>
-              </svg>
-            </button>
-          </div>
-        </header>
-
-        <main class="flex-1 pb-16 lg:pb-0">
-          <slot />
-        </main>
-
-        <footer
-          class="hidden lg:block px-6 py-5 border-t border-[var(--color-border-muted)]"
-        >
-          <div
-            class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--color-fg-subtle)]"
-          >
-            <p>&copy; {year} {ORG_NAME} {SCHOOL_NAME}</p>
-            <p>
-              Powered by <a
-                href={POWERED_BY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="font-medium text-[var(--color-accent)] hover:underline"
-                >{POWERED_BY}</a
-              >
-            </p>
-          </div>
-        </footer>
-      </div>
-    </div>
-
-    <nav
-      class="fixed bottom-0 left-0 right-0 z-40 lg:hidden glass border-t border-[var(--glass-border)]"
-    >
-      <div class="flex items-stretch justify-around h-14 max-w-sm mx-auto">
-        <a
-          href="/"
-          aria-label="Beranda"
-          class={`flex flex-col items-center justify-center gap-1 flex-1 text-[10px] font-medium transition-colors ${isHome ? "text-[var(--color-accent)]" : "text-[var(--color-fg-muted)]"}`}
+        <button
+          id="theme-toggle"
+          type="button"
+          aria-label="Ganti tema"
+          class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -1023,17 +1005,82 @@ const year = new Date().getFullYear();
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class="w-5 h-5"
+            class="w-4 h-4 hidden dark:block"
+          >
+            <circle cx="12" cy="12" r="4"></circle>
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+            ></path>
+          </svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-4 h-4 block dark:hidden"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <main class="flex-1 pb-20 lg:pb-0">
+        <slot />
+      </main>
+
+      <footer
+        class="hidden lg:block px-6 py-4 border-t border-[var(--color-border-muted)]"
+      >
+        <div
+          class="flex flex-col sm:flex-row items-center justify-between gap-1.5 text-xs text-[var(--color-fg-subtle)]"
+        >
+          <p>&copy; {year} {ORG_NAME} &mdash; {SCHOOL_NAME}</p>
+          <p>
+            Powered by{" "}
+            <a
+              href={POWERED_BY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium text-[var(--color-accent)] hover:underline"
+            >
+              {POWERED_BY}
+            </a>
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <nav
+      class="mobile-nav fixed bottom-0 left-0 right-0 z-40 lg:hidden glass border-t border-[var(--glass-border)]"
+      aria-label="Navigasi utama"
+    >
+      <div
+        class="flex items-stretch h-16"
+        style="max-width:360px;margin:0 auto"
+      >
+        <a
+          href="/"
+          aria-label="Beranda"
+          class={`mobile-nav-item ${isHome ? "mobile-nav-active" : "mobile-nav-inactive"}`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-[22px] h-[22px]"
           >
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
-          Beranda
+          <span>Beranda</span>
         </a>
         <a
           href="/albums"
           aria-label="Album"
-          class={`flex flex-col items-center justify-center gap-1 flex-1 text-[10px] font-medium transition-colors ${isAlbums ? "text-[var(--color-accent)]" : "text-[var(--color-fg-muted)]"}`}
+          class={`mobile-nav-item ${isAlbums ? "mobile-nav-active" : "mobile-nav-inactive"}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -1041,20 +1088,21 @@ const year = new Date().getFullYear();
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class="w-5 h-5"
+            class="w-[22px] h-[22px]"
           >
             <path
               d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
             ></path>
           </svg>
-          Album
+          <span>Album</span>
         </a>
       </div>
     </nav>
 
     <div
       id="install-banner"
-      class="fixed bottom-20 lg:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2.5rem)] max-w-sm"
+      class="fixed z-50 w-[calc(100%-2.5rem)] max-w-sm"
+      style="bottom:5.5rem;left:50%;transform:translateX(-50%) translateY(calc(100% + 1.5rem));opacity:0;pointer-events:none;transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1),opacity 0.38s ease"
       aria-live="polite"
     >
       <div
@@ -1085,7 +1133,7 @@ const year = new Date().getFullYear();
               Install Aplikasi
             </p>
             <p class="text-xs text-[var(--color-fg-muted)] mt-0.5">
-              Akses dokumentasi {ORG_NAME} lebih cepat langsung dari layar utama.
+              Akses dokumentasi {ORG_NAME} lebih cepat dari layar utama.
             </p>
           </div>
         </div>
@@ -1112,24 +1160,37 @@ const year = new Date().getFullYear();
           localStorage.setItem("theme", isDark ? "dark" : "light");
         });
 
+      var sbToggle = document.getElementById("sidebar-toggle");
+      sbToggle &&
+        sbToggle.addEventListener("click", function () {
+          var c = document.body.classList.toggle("sb-collapsed");
+          localStorage.setItem("sb-collapsed", c ? "1" : "0");
+        });
+
       var deferredPrompt = null;
       var banner = document.getElementById("install-banner");
       var btnInst = document.getElementById("install-btn");
       var btnDism = document.getElementById("install-dismiss");
 
+      function showBanner() {
+        banner.style.transform = "translateX(-50%) translateY(0)";
+        banner.style.opacity = "1";
+        banner.style.pointerEvents = "auto";
+      }
+      function hideBanner() {
+        banner.style.transform =
+          "translateX(-50%) translateY(calc(100% + 1.5rem))";
+        banner.style.opacity = "0";
+        banner.style.pointerEvents = "none";
+      }
+
       window.addEventListener("beforeinstallprompt", function (e) {
         e.preventDefault();
         deferredPrompt = e;
         if (!localStorage.getItem("pwa-dismissed")) {
-          setTimeout(function () {
-            banner.classList.add("show");
-          }, 2000);
+          setTimeout(showBanner, 2500);
         }
       });
-
-      function hideBanner() {
-        banner.classList.remove("show");
-      }
 
       btnInst &&
         btnInst.addEventListener("click", async function () {
@@ -1746,6 +1807,8 @@ export const GET: APIRoute = () => {
     --shadow-sm: 0 1px 3px rgba(31, 35, 40, 0.08), 0 1px 2px rgba(31, 35, 40, 0.06);
     --shadow-md: 0 4px 16px rgba(31, 35, 40, 0.10), 0 2px 6px rgba(31, 35, 40, 0.06);
     --shadow-lg: 0 12px 40px rgba(31, 35, 40, 0.14), 0 4px 12px rgba(31, 35, 40, 0.08);
+    --sb-width: 15rem;
+    --sb-width-collapsed: 3.5rem;
 }
 
 .dark {
@@ -1787,6 +1850,70 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Sidebar layout (desktop only) ─────────────────────────── */
+@media (min-width: 1024px) {
+    #app-sidebar {
+        width: var(--sb-width);
+        transition: width 0.28s ease;
+    }
+
+    #app-content {
+        padding-left: var(--sb-width);
+        transition: padding-left 0.28s ease;
+    }
+
+    body.sb-collapsed #app-sidebar {
+        width: var(--sb-width-collapsed);
+    }
+
+    body.sb-collapsed #app-content {
+        padding-left: var(--sb-width-collapsed);
+    }
+}
+
+/* ── Sidebar collapsed state ────────────────────────────────── */
+body.sb-collapsed #app-sidebar .sb-label,
+body.sb-collapsed #app-sidebar .sb-expanded {
+    display: none;
+}
+
+body.sb-collapsed #app-sidebar .sb-nav-item {
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* ── Mobile bottom nav ──────────────────────────────────────── */
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+    font-size: 0.625rem;
+    font-weight: 500;
+    padding: 0.5rem 0.25rem;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.18s ease;
+    text-decoration: none;
+}
+
+.mobile-nav-active {
+    color: var(--color-accent);
+}
+
+.mobile-nav-inactive {
+    color: var(--color-fg-muted);
+}
+
+.mobile-nav-inactive:hover {
+    color: var(--color-fg);
+}
+
+/* ── Glass ──────────────────────────────────────────────────── */
 .glass {
     background: var(--glass-bg);
     backdrop-filter: blur(20px) saturate(200%);
@@ -1794,6 +1921,7 @@ body {
     border: 1px solid var(--glass-border);
 }
 
+/* ── Glossy card ────────────────────────────────────────────── */
 .glossy-card {
     position: relative;
     background: var(--color-canvas-subtle);
@@ -1817,6 +1945,7 @@ body {
     z-index: 1;
 }
 
+/* ── Infinite slider ────────────────────────────────────────── */
 .zigzag-row {
     width: 100%;
     overflow: hidden;
@@ -1865,17 +1994,7 @@ body {
     }
 }
 
-#install-banner {
-    transform: translateY(calc(100% + 1.5rem));
-    transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.38s ease;
-    opacity: 0;
-}
-
-#install-banner.show {
-    transform: translateY(0);
-    opacity: 1;
-}
-
+/* ── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -1894,6 +2013,7 @@ body {
     background: var(--color-fg-muted);
 }
 
+/* ── Selection ──────────────────────────────────────────────── */
 ::selection {
     background: var(--color-accent-subtle);
     color: var(--color-fg);

@@ -59,112 +59,48 @@ const year = new Date().getFullYear();
         var d = matchMedia("(prefers-color-scheme: dark)").matches;
         if ((s ?? (d ? "dark" : "light")) === "dark")
           document.documentElement.classList.add("dark");
+        if (localStorage.getItem("sb-collapsed") === "1")
+          document.body.classList.add("sb-collapsed");
       })();
     </script>
   </head>
+
   <body
     class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen antialiased"
   >
-    <div class="lg:flex min-h-screen">
-      <slot name="sidebar" />
+    <slot name="sidebar" />
 
-      <div class="flex-1 min-w-0 flex flex-col">
-        <header
-          class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 h-14 border-b border-[var(--glass-border)]"
-        >
-          <a
-            href="/"
-            class="font-semibold tracking-tight text-[var(--color-fg)] text-sm flex items-center gap-2.5"
+    <div id="app-content" class="flex flex-col min-h-screen">
+      <header
+        class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-5 h-14 border-b border-[var(--glass-border)] shrink-0"
+      >
+        <div class="flex items-center gap-2">
+          <button
+            id="sidebar-toggle"
+            type="button"
+            aria-label="Toggle sidebar"
+            class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200 shrink-0"
           >
-            <span
-              class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                stroke-width="2"
-                class="w-3.5 h-3.5"
-              >
-                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-              </svg>
-            </span>
-            <span class="hidden sm:block">{SITE_NAME}</span>
-            <span class="block sm:hidden">{SITE_SHORT_NAME}</span>
-          </a>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
 
-          <div class="flex items-center gap-2">
-            <button
-              id="theme-toggle"
-              type="button"
-              aria-label="Ganti tema"
-              class="p-2 rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="w-4 h-4 hidden dark:block"
-              >
-                <circle cx="12" cy="12" r="4"></circle>
-                <path
-                  d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
-                ></path>
-              </svg>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="w-4 h-4 block dark:hidden"
-              >
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-                ></path>
-              </svg>
-            </button>
-          </div>
-        </header>
-
-        <main class="flex-1 pb-16 lg:pb-0">
-          <slot />
-        </main>
-
-        <footer
-          class="hidden lg:block px-6 py-5 border-t border-[var(--color-border-muted)]"
-        >
-          <div
-            class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--color-fg-subtle)]"
-          >
-            <p>&copy; {year} {ORG_NAME} {SCHOOL_NAME}</p>
-            <p>
-              Powered by <a
-                href={POWERED_BY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="font-medium text-[var(--color-accent)] hover:underline"
-                >{POWERED_BY}</a
-              >
-            </p>
-          </div>
-        </footer>
-      </div>
-    </div>
-
-    <nav
-      class="fixed bottom-0 left-0 right-0 z-40 lg:hidden glass border-t border-[var(--glass-border)]"
-    >
-      <div class="flex items-stretch justify-around h-14 max-w-sm mx-auto">
-        <a
-          href="/"
-          aria-label="Beranda"
-          class={`flex flex-col items-center justify-center gap-1 flex-1 text-[10px] font-medium transition-colors ${isHome ? "text-[var(--color-accent)]" : "text-[var(--color-fg-muted)]"}`}
+        <button
+          id="theme-toggle"
+          type="button"
+          aria-label="Ganti tema"
+          class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -172,17 +108,82 @@ const year = new Date().getFullYear();
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class="w-5 h-5"
+            class="w-4 h-4 hidden dark:block"
+          >
+            <circle cx="12" cy="12" r="4"></circle>
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+            ></path>
+          </svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-4 h-4 block dark:hidden"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <main class="flex-1 pb-20 lg:pb-0">
+        <slot />
+      </main>
+
+      <footer
+        class="hidden lg:block px-6 py-4 border-t border-[var(--color-border-muted)]"
+      >
+        <div
+          class="flex flex-col sm:flex-row items-center justify-between gap-1.5 text-xs text-[var(--color-fg-subtle)]"
+        >
+          <p>&copy; {year} {ORG_NAME} &mdash; {SCHOOL_NAME}</p>
+          <p>
+            Powered by{" "}
+            <a
+              href={POWERED_BY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium text-[var(--color-accent)] hover:underline"
+            >
+              {POWERED_BY}
+            </a>
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <nav
+      class="mobile-nav fixed bottom-0 left-0 right-0 z-40 lg:hidden glass border-t border-[var(--glass-border)]"
+      aria-label="Navigasi utama"
+    >
+      <div
+        class="flex items-stretch h-16"
+        style="max-width:360px;margin:0 auto"
+      >
+        <a
+          href="/"
+          aria-label="Beranda"
+          class={`mobile-nav-item ${isHome ? "mobile-nav-active" : "mobile-nav-inactive"}`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-[22px] h-[22px]"
           >
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
-          Beranda
+          <span>Beranda</span>
         </a>
         <a
           href="/albums"
           aria-label="Album"
-          class={`flex flex-col items-center justify-center gap-1 flex-1 text-[10px] font-medium transition-colors ${isAlbums ? "text-[var(--color-accent)]" : "text-[var(--color-fg-muted)]"}`}
+          class={`mobile-nav-item ${isAlbums ? "mobile-nav-active" : "mobile-nav-inactive"}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -190,20 +191,21 @@ const year = new Date().getFullYear();
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class="w-5 h-5"
+            class="w-[22px] h-[22px]"
           >
             <path
               d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
             ></path>
           </svg>
-          Album
+          <span>Album</span>
         </a>
       </div>
     </nav>
 
     <div
       id="install-banner"
-      class="fixed bottom-20 lg:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2.5rem)] max-w-sm"
+      class="fixed z-50 w-[calc(100%-2.5rem)] max-w-sm"
+      style="bottom:5.5rem;left:50%;transform:translateX(-50%) translateY(calc(100% + 1.5rem));opacity:0;pointer-events:none;transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1),opacity 0.38s ease"
       aria-live="polite"
     >
       <div
@@ -234,7 +236,7 @@ const year = new Date().getFullYear();
               Install Aplikasi
             </p>
             <p class="text-xs text-[var(--color-fg-muted)] mt-0.5">
-              Akses dokumentasi {ORG_NAME} lebih cepat langsung dari layar utama.
+              Akses dokumentasi {ORG_NAME} lebih cepat dari layar utama.
             </p>
           </div>
         </div>
@@ -261,24 +263,37 @@ const year = new Date().getFullYear();
           localStorage.setItem("theme", isDark ? "dark" : "light");
         });
 
+      var sbToggle = document.getElementById("sidebar-toggle");
+      sbToggle &&
+        sbToggle.addEventListener("click", function () {
+          var c = document.body.classList.toggle("sb-collapsed");
+          localStorage.setItem("sb-collapsed", c ? "1" : "0");
+        });
+
       var deferredPrompt = null;
       var banner = document.getElementById("install-banner");
       var btnInst = document.getElementById("install-btn");
       var btnDism = document.getElementById("install-dismiss");
 
+      function showBanner() {
+        banner.style.transform = "translateX(-50%) translateY(0)";
+        banner.style.opacity = "1";
+        banner.style.pointerEvents = "auto";
+      }
+      function hideBanner() {
+        banner.style.transform =
+          "translateX(-50%) translateY(calc(100% + 1.5rem))";
+        banner.style.opacity = "0";
+        banner.style.pointerEvents = "none";
+      }
+
       window.addEventListener("beforeinstallprompt", function (e) {
         e.preventDefault();
         deferredPrompt = e;
         if (!localStorage.getItem("pwa-dismissed")) {
-          setTimeout(function () {
-            banner.classList.add("show");
-          }, 2000);
+          setTimeout(showBanner, 2500);
         }
       });
-
-      function hideBanner() {
-        banner.classList.remove("show");
-      }
 
       btnInst &&
         btnInst.addEventListener("click", async function () {

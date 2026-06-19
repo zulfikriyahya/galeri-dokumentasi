@@ -22,6 +22,8 @@
     --shadow-sm: 0 1px 3px rgba(31, 35, 40, 0.08), 0 1px 2px rgba(31, 35, 40, 0.06);
     --shadow-md: 0 4px 16px rgba(31, 35, 40, 0.10), 0 2px 6px rgba(31, 35, 40, 0.06);
     --shadow-lg: 0 12px 40px rgba(31, 35, 40, 0.14), 0 4px 12px rgba(31, 35, 40, 0.08);
+    --sb-width: 15rem;
+    --sb-width-collapsed: 3.5rem;
 }
 
 .dark {
@@ -63,6 +65,70 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Sidebar layout (desktop only) ─────────────────────────── */
+@media (min-width: 1024px) {
+    #app-sidebar {
+        width: var(--sb-width);
+        transition: width 0.28s ease;
+    }
+
+    #app-content {
+        padding-left: var(--sb-width);
+        transition: padding-left 0.28s ease;
+    }
+
+    body.sb-collapsed #app-sidebar {
+        width: var(--sb-width-collapsed);
+    }
+
+    body.sb-collapsed #app-content {
+        padding-left: var(--sb-width-collapsed);
+    }
+}
+
+/* ── Sidebar collapsed state ────────────────────────────────── */
+body.sb-collapsed #app-sidebar .sb-label,
+body.sb-collapsed #app-sidebar .sb-expanded {
+    display: none;
+}
+
+body.sb-collapsed #app-sidebar .sb-nav-item {
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* ── Mobile bottom nav ──────────────────────────────────────── */
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+    font-size: 0.625rem;
+    font-weight: 500;
+    padding: 0.5rem 0.25rem;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.18s ease;
+    text-decoration: none;
+}
+
+.mobile-nav-active {
+    color: var(--color-accent);
+}
+
+.mobile-nav-inactive {
+    color: var(--color-fg-muted);
+}
+
+.mobile-nav-inactive:hover {
+    color: var(--color-fg);
+}
+
+/* ── Glass ──────────────────────────────────────────────────── */
 .glass {
     background: var(--glass-bg);
     backdrop-filter: blur(20px) saturate(200%);
@@ -70,6 +136,7 @@ body {
     border: 1px solid var(--glass-border);
 }
 
+/* ── Glossy card ────────────────────────────────────────────── */
 .glossy-card {
     position: relative;
     background: var(--color-canvas-subtle);
@@ -93,6 +160,7 @@ body {
     z-index: 1;
 }
 
+/* ── Infinite slider ────────────────────────────────────────── */
 .zigzag-row {
     width: 100%;
     overflow: hidden;
@@ -141,17 +209,7 @@ body {
     }
 }
 
-#install-banner {
-    transform: translateY(calc(100% + 1.5rem));
-    transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.38s ease;
-    opacity: 0;
-}
-
-#install-banner.show {
-    transform: translateY(0);
-    opacity: 1;
-}
-
+/* ── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -170,6 +228,7 @@ body {
     background: var(--color-fg-muted);
 }
 
+/* ── Selection ──────────────────────────────────────────────── */
 ::selection {
     background: var(--color-accent-subtle);
     color: var(--color-fg);

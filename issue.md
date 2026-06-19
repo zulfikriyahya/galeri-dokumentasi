@@ -32,9 +32,23 @@
 - untuk font dan tampilan warna tema saya suka (sudah pas)
 
 ## Issue
-- Perbaiki Tombol Home dan Album pada tampilan Smartphone (Tidak Bisa diklik)
-- Tambahkan Fungsi Toggle Hidden Sidebar
-- Tampilkan hanya logo pada saat sidebar dihidden
-- Tampilkan hanya satu Brand Logo dan Site Name / Site Shortname baik pada tampilan desktop dan Smartphone
+- Logo dan brand name di tampilan smartphone tidak ada (perbaiki)
+- logo dan brand name di tampilan desktop cukup satu di sidebar dan sembunyikan brandname ketika toggle hidden (cukup logo saja yang terlihat)
+- ubah svg berikut agar lebih matching tuntuk toggle button dan sembunyikan ketika toggle hidden
+```
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    class="w-4 h-4"
+>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+</svg>
+```
+- pindahkan daftar pengecualian ke .env `const EXCLUDED_ALBUM_KEYWORDS = ["UNGGAH DOKUMENTASI"];` agar mudah suatu saat untuk perubahannya.
 
 finalkan project ini!
