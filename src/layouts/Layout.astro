@@ -6,7 +6,7 @@ interface Props {
     description?: string;
 }
 
-const { title = "ROHIS Gallery", description = "Dokumentasi kegiatan ROHIS dalam satu tempat." } = Astro.props;
+const { title = "DOKUMENTASI ROHIS", description = "Dokumentasi kegiatan ROHIS dalam satu tempat." } = Astro.props;
 const ogImage = "/og.png";
 ---
 
@@ -22,7 +22,7 @@ const ogImage = "/og.png";
     <meta property="og:image" content={ogImage} />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="ROHIS Gallery" />
+    <meta name="apple-mobile-web-app-title" content="DOKUMENTASI ROHIS" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -40,7 +40,7 @@ const ogImage = "/og.png";
       <slot name="sidebar" />
       <div class="flex-1 min-w-0 flex flex-col">
         <header class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--glass-border)]">
-          <a href="/" class="font-semibold tracking-tight text-[var(--color-fg)]">ROHIS Gallery</a>
+          <a href="/" class="font-semibold tracking-tight text-[var(--color-fg)]">DOKUMENTASI ROHIS</a>
           <button
             id="theme-toggle"
             type="button"
@@ -59,9 +59,24 @@ const ogImage = "/og.png";
         <main class="flex-1">
           <slot />
         </main>
+
         <footer class="px-6 py-4 text-center text-xs text-[var(--color-fg-muted)] border-t border-[var(--color-border)]">
-          ROHIS Gallery &copy; {new Date().getFullYear()}
+          <p>
+            &copy; {new Date().getFullYear()} ROHIS SMKN 1 PANDEGLANG
+          </p>
+          <p class="mt-1 opacity-75">
+            Powered by{" "}
+            <a
+              href="https://zedlabs.id"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium text-[var(--color-accent)] hover:underline"
+            >
+              ZEDLABS TEKNOLOGI INDONESIA
+            </a>
+          </p>
         </footer>
+
       </div>
     </div>
 
@@ -69,7 +84,7 @@ const ogImage = "/og.png";
       id="install-banner"
       class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm glass rounded-2xl px-5 py-4 shadow-xl border border-[var(--glass-border)] hidden"
     >
-      <p class="text-sm font-medium text-[var(--color-fg)] mb-3">Install ROHIS Gallery ke layar utama?</p>
+      <p class="text-sm font-medium text-[var(--color-fg)] mb-3">Install DOKUMENTASI ROHIS ke layar utama?</p>
       <div class="flex gap-2">
         <button id="install-btn" class="flex-1 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity">Install</button>
         <button id="install-dismiss" class="flex-1 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] transition-colors">Nanti</button>
