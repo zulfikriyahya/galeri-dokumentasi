@@ -1,0 +1,17 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import AlbumGrid from "../components/AlbumGrid.astro";
+import { getAllAlbums } from "../lib/immich";
+
+const albums = await getAllAlbums();
+---
+
+<Layout title="Galeri - ROHIS Gallery">
+  <Sidebar slot="sidebar" albums={albums} />
+
+  <section class="px-4 sm:px-6 py-10">
+    <h1 class="text-3xl font-bold mb-8">Semua Album</h1>
+    <AlbumGrid albums={albums} />
+  </section>
+</Layout>

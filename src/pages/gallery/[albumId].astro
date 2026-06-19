@@ -1,0 +1,54 @@
+---
+export const prerender = true;
+
+import { getAllAlbums, getAlbumById, getAlbumShareUrl } from "../../lib/immich";
+import Lightbox from "../../components/Lightbox.astro";
+import Layout from "../../layouts/Layout.astro";
+import Sidebar from "../../components/Sidebar.astro";
+
+export async function getStaticPaths() {
+  const albums = await getAllAlbums();
+  return albums.map((album) => ({
+    params: { albumId: album.id },
+  }));
+}
+
+const { albumId } = Astro.params;
+const album = await getAlbumById(albumId!);
+const albums = await getAllAlbums();
+---
+
+<Layout title={album.albumName}>
+  <Sidebar slot="sidebar" albums={albums} activeId={album.id} />
+
+  <div class="px-4 sm:px-6 py-10">
+    <a href="/gallery" class="text-[var(--color-accent)] hover:underline text-sm mb-4 inline-block">
+      Kembali ke Galeri
+    </a>
+    <h1 class="text-3xl sm:text-4xl font-bold">{album.albumName}</h1>
+    {album.description && (
+      <p class="text-[var(--color-fg-muted)] mt-2">{album.description}</p>
+    )}
+    <div class="flex items-center gap-4 mt-3">
+      <span class="text-sm text-[var(--color-fg-muted)]">{album.assetCount} foto</span>
+      {album.shared && (
+        
+          href={getAlbumShareUrl(album.id)}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-white text-sm hover:opacity-90 transition-opacity"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+            <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"></path>
+            <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"></path>
+          </svg>
+          Share Link
+        </a>
+      )}
+    </div>
+
+    <div class="mt-8">
+      <Lightbox assets={album.assets} />
+    </div>
+  </div>
+</Layout>

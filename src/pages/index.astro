@@ -1,0 +1,26 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import InfiniteSlider from "../components/InfiniteSlider.astro";
+import AlbumGrid from "../components/AlbumGrid.astro";
+import { getAllAlbums, getRecentAssets } from "../lib/immich";
+
+const albums = await getAllAlbums();
+const recentAssets = await getRecentAssets(24);
+---
+
+<Layout title="ROHIS Gallery">
+  <Sidebar slot="sidebar" albums={albums} />
+
+  <section class="px-4 sm:px-6 py-10">
+    <h1 class="text-3xl sm:text-4xl font-bold mb-2">Galeri ROHIS</h1>
+    <p class="text-[var(--color-fg-muted)]">Dokumentasi kegiatan dalam satu tempat.</p>
+  </section>
+
+  {recentAssets.length > 0 && <InfiniteSlider assets={recentAssets} />}
+
+  <section class="px-4 sm:px-6 py-10">
+    <h2 class="text-xl font-semibold mb-6">Semua Album</h2>
+    <AlbumGrid albums={albums} />
+  </section>
+</Layout>

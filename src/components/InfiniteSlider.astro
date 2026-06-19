@@ -1,0 +1,40 @@
+---
+import type { ImmichAsset } from "../lib/immich";
+import { getThumbnailUrl } from "../lib/immich";
+
+interface Props {
+  assets: ImmichAsset[];
+}
+
+const { assets } = Astro.props;
+const half = Math.ceil(assets.length / 2);
+const rowOne = assets.slice(0, half);
+const rowTwo = assets.slice(half);
+---
+
+<div class="space-y-4 py-6">
+  <div class="zigzag-row">
+    <div class="zigzag-track zigzag-left">
+      {[...rowOne, ...rowOne].map((asset) => (
+        <img
+          src={getThumbnailUrl(asset.id, "preview")}
+          alt={asset.originalFileName}
+          loading="lazy"
+          class="h-32 sm:h-40 w-auto rounded-xl object-cover glossy-card"
+        />
+      ))}
+    </div>
+  </div>
+  <div class="zigzag-row">
+    <div class="zigzag-track zigzag-right">
+      {[...rowTwo, ...rowTwo].map((asset) => (
+        <img
+          src={getThumbnailUrl(asset.id, "preview")}
+          alt={asset.originalFileName}
+          loading="lazy"
+          class="h-32 sm:h-40 w-auto rounded-xl object-cover glossy-card"
+        />
+      ))}
+    </div>
+  </div>
+</div>
