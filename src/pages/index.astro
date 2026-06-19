@@ -5,30 +5,109 @@ import InfiniteSlider from "../components/InfiniteSlider.astro";
 import AlbumGrid from "../components/AlbumGrid.astro";
 import { getAllAlbums, getRecentAssets } from "../lib/immich";
 
+const SITE_DESCRIPTION =
+  import.meta.env.SITE_DESCRIPTION ?? "Dokumentasi kegiatan dalam satu tempat.";
+const ORG_NAME = import.meta.env.ORG_NAME ?? "DOKUMENTASI";
+const SCHOOL_NAME =
+  import.meta.env.SCHOOL_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
+
 const [albums, recentAssets] = await Promise.all([
-    getAllAlbums(),
-    getRecentAssets(24),
+  getAllAlbums(),
+  getRecentAssets(30),
 ]);
+
+const totalPhotos = albums.reduce((s, a) => s + a.assetCount, 0);
 ---
 
-<Layout title="DOKUMENTASI ROHIS">
+<Layout activePath="/">
   <Sidebar slot="sidebar" albums={albums} />
 
-  <section class="px-4 sm:px-8 pt-10 pb-4">
-    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight mb-1">Semua Kegiatan</h1>
-    <p class="text-sm text-[var(--color-fg-muted)]">Dokumentasi kegiatan dalam satu tempat.</p>
+  <section class="px-5 sm:px-8 pt-10 pb-6">
+    <div class="max-w-2xl">
+      <p
+        class="text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)] mb-2"
+      >
+        Dokumentasi Kegiatan
+      </p>
+      <!-- <h1
+        class="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--color-fg)] mb-2 leading-tight"
+      >
+        Semua kegiatan {ORG_NAME}<br />dalam satu tempat.
+      </h1> -->
+      <p class="text-sm text-[var(--color-fg-muted)] leading-relaxed">
+        {SITE_DESCRIPTION} &mdash; {SCHOOL_NAME}.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-5 mt-6 flex-wrap">
+      <div class="flex items-baseline gap-1.5">
+        <span
+          class="text-2xl sm:text-3xl font-bold tabular-nums text-[var(--color-fg)]"
+          >{albums.length}</span
+        >
+        <span class="text-xs text-[var(--color-fg-muted)] font-medium"
+          >Album Publik</span
+        >
+      </div>
+      <div class="w-px h-6 bg-[var(--color-border)]"></div>
+      <div class="flex items-baseline gap-1.5">
+        <span
+          class="text-2xl sm:text-3xl font-bold tabular-nums text-[var(--color-fg)]"
+          >{totalPhotos.toLocaleString("id-ID")}</span
+        >
+        <span class="text-xs text-[var(--color-fg-muted)] font-medium"
+          >Foto</span
+        >
+      </div>
+      <div class="w-px h-6 bg-[var(--color-border)]"></div>
+      <a
+        href="/albums"
+        class="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-accent)] hover:underline"
+      >
+        Lihat semua album
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          class="w-3 h-3"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7"></path>
+        </svg>
+      </a>
+    </div>
   </section>
 
-  {recentAssets.length > 0 && <InfiniteSlider assets={recentAssets} />}
+  {
+    recentAssets.length > 0 && (
+      <div class="border-y border-[var(--color-border-muted)] bg-[var(--color-canvas-subtle)]">
+        <InfiniteSlider assets={recentAssets} />
+      </div>
+    )
+  }
 
-  <section class="px-4 sm:px-8 py-8">
-    <h2 class="text-base font-semibold mb-4 text-[var(--color-fg-muted)] uppercase tracking-widest text-xs">Semua Album</h2>
+  <section class="px-5 sm:px-8 py-8">
+    <div class="flex items-center justify-between mb-5">
+      <h2
+        class="text-xs font-semibold uppercase tracking-widest text-[var(--color-fg-subtle)]"
+      >
+        Album Publik
+      </h2>
+      <a
+        href="/albums"
+        class="text-xs text-[var(--color-accent)] font-medium hover:underline"
+        >Lihat semua</a
+      >
+    </div>
     <AlbumGrid albums={albums} />
   </section>
 </Layout>
 
 <script is:inline>
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js");
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js");
+    });
   }
 </script>

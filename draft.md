@@ -5,6 +5,14 @@
 ```
 IMMICH_BASE_URL=https://galeri-rohis.zedlabs.id
 IMMICH_API_KEY=NUaPrJHlmuJJQAiaOWgXgKl2grOR2PzX9pnotGw
+
+SITE_NAME=DOKUMENTASI ROHIS
+SITE_SHORT_NAME=ROHIS
+SITE_DESCRIPTION=Dokumentasi kegiatan dalam satu tempat.
+ORG_NAME=ROHIS
+SCHOOL_NAME=SMKN 1 PANDEGLANG
+POWERED_BY=ZEDLABS TEKNOLOGI INDONESIA
+POWERED_BY_URL=https://zedlabs.id
 ```
 
 ---
@@ -83,52 +91,13 @@ allowBuilds:
 
 ## Direktory: public
 
-### File: `./public/manifest.webmanifest`
-
-```
-{
-    "name": "DOKUMENTASI ROHIS",
-    "short_name": "ROHIS",
-    "description": "Dokumentasi kegiatan ROHIS dalam satu tempat.",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#0969da",
-    "orientation": "portrait-primary",
-    "icons": [
-        {
-            "src": "/icons/icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "/icons/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        }
-    ],
-    "screenshots": [
-        {
-            "src": "/og.png",
-            "sizes": "1200x630",
-            "type": "image/png",
-            "form_factor": "wide"
-        }
-    ]
-}
-```
-
----
-
 ### File: `./public/sw.js`
 
 ```js
-const CACHE_STATIC = "rohis-static-v1";
-const CACHE_IMAGES = "rohis-images-v1";
+const CACHE_STATIC = "static-v1";
+const CACHE_IMAGES = "images-v1";
 
-const STATIC_ASSETS = ["/", "/album", "/manifest.webmanifest", "/favicon.svg"];
+const STATIC_ASSETS = ["/", "/albums", "/favicon.svg"];
 
 self.addEventListener("install", (e) => {
     e.waitUntil(
@@ -256,57 +225,115 @@ import type { ImmichAlbum } from "../lib/immich";
 import { getAlbumCoverUrl } from "../lib/immich";
 
 interface Props {
-    albums: ImmichAlbum[];
+  albums: ImmichAlbum[];
 }
 
 const { albums } = Astro.props;
 
 function spanFor(index: number): string {
-    const p = index % 7;
-    if (p === 0) return "sm:col-span-2 sm:row-span-2";
-    if (p === 3) return "sm:col-span-2";
-    return "";
+  const p = index % 9;
+  if (p === 0) return "sm:col-span-2 sm:row-span-2";
+  if (p === 4) return "sm:col-span-2";
+  if (p === 7) return "sm:col-span-2";
+  return "";
 }
 
 const items = albums.map((album, i) => ({
-    album,
-    href: "/gallery/" + album.id,
-    cover: getAlbumCoverUrl(album),
-    span: spanFor(i),
+  album,
+  href: "/albums/" + album.id,
+  cover: getAlbumCoverUrl(album),
+  span: spanFor(i),
 }));
 ---
 
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 auto-rows-[160px] sm:auto-rows-[180px]">
-  {items.map((item) => (
-    <a
-      href={item.href}
-      class:list={["group relative overflow-hidden rounded-2xl glossy-card", item.span]}
-    >
-      {item.cover ? (
-        <img
-          src={item.cover}
-          alt={item.album.albumName}
-          loading="lazy"
-          decoding="async"
-          class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-      ) : (
-        <div class="absolute inset-0 flex items-center justify-center bg-[var(--color-canvas-subtle)]">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8 text-[var(--color-fg-muted)]">
-            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <path d="M21 15l-5-5L5 21"></path>
-          </svg>
-        </div>
-      )}
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-      <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 text-white">
-        <h3 class="font-medium text-sm sm:text-base leading-tight truncate">{item.album.albumName}</h3>
-        <span class="text-xs text-white/60 mt-0.5 block">{item.album.assetCount} foto</span>
+{
+  albums.length === 0 ? (
+    <div class="flex flex-col items-center justify-center py-24 gap-4 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-[var(--color-canvas-subtle)] border border-[var(--color-border)] flex items-center justify-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          class="w-6 h-6 text-[var(--color-fg-subtle)]"
+        >
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+        </svg>
       </div>
-    </a>
-  ))}
-</div>
+      <p class="text-sm text-[var(--color-fg-muted)] font-medium">
+        Belum ada data
+      </p>
+    </div>
+  ) : (
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 auto-rows-[150px] sm:auto-rows-[175px]">
+      {items.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            "group relative overflow-hidden rounded-2xl glossy-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2",
+            item.span,
+          ]}
+        >
+          {item.cover ? (
+            <img
+              src={item.cover}
+              alt={item.album.albumName}
+              loading="lazy"
+              decoding="async"
+              class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+            />
+          ) : (
+            <div class="absolute inset-0 flex items-center justify-center bg-[var(--color-canvas-inset)]">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                class="w-8 h-8 text-[var(--color-fg-subtle)]"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="M21 15l-5-5L5 21" />
+              </svg>
+            </div>
+          )}
+          <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent group-hover:from-black/80 transition-all duration-300" />
+          <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-3.5 text-white z-10">
+            <h3 class="font-semibold text-sm sm:text-[0.9rem] leading-snug line-clamp-2">
+              {item.album.albumName}
+            </h3>
+            <span class="text-[11px] text-white/55 mt-0.5 block">
+              {item.album.assetCount} foto
+            </span>
+          </div>
+          {item.album.shared && (
+            <div class="absolute top-2.5 right-2.5 z-10">
+              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm text-[10px] font-medium text-white/80">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  class="w-2.5 h-2.5"
+                >
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
+                </svg>
+                Publik
+              </span>
+            </div>
+          )}
+        </a>
+      ))}
+    </div>
+  )
+}
+
 ```
 
 ---
@@ -319,7 +346,7 @@ import type { ImmichAsset } from "../lib/immich";
 import { getThumbnailUrl } from "../lib/immich";
 
 interface Props {
-    assets: ImmichAsset[];
+  assets: ImmichAsset[];
 }
 
 const { assets } = Astro.props;
@@ -328,34 +355,39 @@ const rowOne = assets.slice(0, half);
 const rowTwo = assets.slice(half);
 ---
 
-<div class="space-y-3 py-4 overflow-hidden">
+<div class="space-y-2.5 py-4 overflow-hidden select-none">
   <div class="zigzag-row">
     <div class="zigzag-track zigzag-left">
-      {[...rowOne, ...rowOne].map((asset) => (
-        <img
-          src={getThumbnailUrl(asset.id, "preview")}
-          alt={asset.originalFileName}
-          loading="lazy"
-          decoding="async"
-          class="h-28 sm:h-36 w-auto rounded-xl object-cover glossy-card flex-shrink-0"
-        />
-      ))}
+      {
+        [...rowOne, ...rowOne].map((asset) => (
+          <img
+            src={getThumbnailUrl(asset.id, "preview")}
+            alt={asset.originalFileName}
+            loading="lazy"
+            decoding="async"
+            class="h-28 sm:h-36 w-auto rounded-xl object-cover glossy-card flex-shrink-0 pointer-events-none"
+          />
+        ))
+      }
     </div>
   </div>
   <div class="zigzag-row">
     <div class="zigzag-track zigzag-right">
-      {[...rowTwo, ...rowTwo].map((asset) => (
-        <img
-          src={getThumbnailUrl(asset.id, "preview")}
-          alt={asset.originalFileName}
-          loading="lazy"
-          decoding="async"
-          class="h-28 sm:h-36 w-auto rounded-xl object-cover glossy-card flex-shrink-0"
-        />
-      ))}
+      {
+        [...rowTwo, ...rowTwo].map((asset) => (
+          <img
+            src={getThumbnailUrl(asset.id, "preview")}
+            alt={asset.originalFileName}
+            loading="lazy"
+            decoding="async"
+            class="h-28 sm:h-36 w-auto rounded-xl object-cover glossy-card flex-shrink-0 pointer-events-none"
+          />
+        ))
+      }
     </div>
   </div>
 </div>
+
 ```
 
 ---
@@ -368,82 +400,173 @@ import type { ImmichAsset } from "../lib/immich";
 import { getThumbnailUrl, getDownloadUrl } from "../lib/immich";
 
 interface Props {
-    assets: ImmichAsset[];
+  assets: ImmichAsset[];
 }
 
 const { assets } = Astro.props;
 const images = assets.filter((a) => a.type === "IMAGE");
 ---
 
-<div class="columns-2 sm:columns-3 lg:columns-4 gap-2.5 space-y-2.5" id="photo-grid">
-  {images.map((asset, i) => (
-    <button
-      class="block w-full overflow-hidden rounded-xl break-inside-avoid cursor-zoom-in glossy-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-      data-index={i}
-      data-src={getThumbnailUrl(asset.id, "preview")}
-      data-download={getDownloadUrl(asset.id)}
-      data-name={asset.originalFileName}
-      data-date={new Date(asset.fileCreatedAt).toLocaleDateString("id-ID", { dateStyle: "long" })}
-      data-location={[asset.exifInfo?.city, asset.exifInfo?.country].filter(Boolean).join(", ")}
-      aria-label={`Buka foto ${asset.originalFileName}`}
+{
+  images.length === 0 ? (
+    <div class="flex flex-col items-center justify-center py-24 gap-4 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-[var(--color-canvas-subtle)] border border-[var(--color-border)] flex items-center justify-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          class="w-6 h-6 text-[var(--color-fg-subtle)]"
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="M21 15l-5-5L5 21" />
+        </svg>
+      </div>
+      <p class="text-sm text-[var(--color-fg-muted)] font-medium">
+        Belum ada foto di album ini
+      </p>
+    </div>
+  ) : (
+    <div
+      id="photo-grid"
+      class="columns-2 sm:columns-3 lg:columns-4 gap-2 sm:gap-2.5 space-y-2 sm:space-y-2.5"
     >
-      <img
-        src={getThumbnailUrl(asset.id, "thumbnail")}
-        alt={asset.originalFileName}
-        loading="lazy"
-        decoding="async"
-        class="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
-      />
-    </button>
-  ))}
-</div>
+      {images.map((asset, i) => (
+        <button
+          class="block w-full overflow-hidden rounded-xl break-inside-avoid cursor-zoom-in glossy-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 relative group"
+          data-index={i}
+          data-src={getThumbnailUrl(asset.id, "preview")}
+          data-download={getDownloadUrl(asset.id)}
+          data-name={asset.originalFileName}
+          data-date={new Date(asset.fileCreatedAt).toLocaleDateString("id-ID", {
+            dateStyle: "long",
+          })}
+          data-location={[asset.exifInfo?.city, asset.exifInfo?.country]
+            .filter(Boolean)
+            .join(", ")}
+          aria-label={`Buka foto ${asset.originalFileName}`}
+        >
+          <img
+            src={getThumbnailUrl(asset.id, "thumbnail")}
+            alt={asset.originalFileName}
+            loading="lazy"
+            decoding="async"
+            class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 ease-out block"
+          />
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 rounded-xl" />
+          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+                class="w-4 h-4"
+              >
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+              </svg>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  )
+}
 
 <div
   id="lightbox"
   class="fixed inset-0 z-50 hidden"
   role="dialog"
   aria-modal="true"
-  aria-label="Lightbox"
+  aria-label="Lightbox foto"
 >
-  <div class="absolute inset-0 bg-black/85 backdrop-blur-md" id="lb-backdrop"></div>
+  <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" id="lb-backdrop">
+  </div>
 
-  <button id="lb-close" class="absolute top-4 right-4 z-20 p-2 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Tutup">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+  <button
+    id="lb-close"
+    class="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all duration-200 backdrop-blur-sm border border-white/10"
+    aria-label="Tutup lightbox"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      class="w-5 h-5"
+    >
       <path d="M18 6 6 18M6 6l12 12"></path>
     </svg>
   </button>
 
-  <button id="lb-prev" class="absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Sebelumnya">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 sm:w-6 sm:h-6">
+  <button
+    id="lb-prev"
+    class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all duration-200 backdrop-blur-sm border border-white/10"
+    aria-label="Foto sebelumnya"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      class="w-5 h-5"
+    >
       <path d="M15 18l-6-6 6-6"></path>
     </svg>
   </button>
 
-  <div class="absolute inset-0 z-10 flex flex-col items-center justify-center px-14 sm:px-20 gap-4">
-    <div class="relative flex items-center justify-center w-full max-h-[78vh]">
+  <div
+    class="absolute inset-0 z-10 flex flex-col items-center justify-center px-14 sm:px-20 gap-3 sm:gap-4"
+  >
+    <div
+      class="relative flex items-center justify-center w-full"
+      style="max-height: calc(100vh - 8rem)"
+    >
       <img
         id="lb-img"
         src=""
         alt=""
-        class="max-h-[78vh] max-w-full object-contain rounded-xl shadow-2xl"
-        style="opacity:0;transition:opacity 0.2s ease"
+        class="max-h-[calc(100vh-8rem)] max-w-full object-contain rounded-xl"
+        style="opacity:0;transition:opacity 0.22s ease, transform 0.22s ease;transform:scale(0.97)"
       />
     </div>
 
-    <div class="glass rounded-xl px-4 py-3 w-full max-w-xl flex items-center justify-between gap-4">
+    <div
+      class="glass rounded-2xl px-4 sm:px-5 py-3 w-full max-w-lg flex items-center justify-between gap-3 sm:gap-4"
+    >
       <div class="min-w-0 flex-1">
-        <p id="lb-name" class="text-white text-sm font-medium truncate"></p>
-        <p id="lb-meta" class="text-white/50 text-xs mt-0.5 truncate"></p>
+        <p
+          id="lb-name"
+          class="text-white text-xs sm:text-sm font-medium truncate leading-snug"
+        >
+        </p>
+        <p id="lb-meta" class="text-white/45 text-[11px] mt-0.5 truncate"></p>
       </div>
-      <div class="flex items-center gap-2 shrink-0">
-        <p id="lb-counter" class="text-white/40 text-xs tabular-nums"></p>
+      <div class="flex items-center gap-2.5 shrink-0">
+        <p
+          id="lb-counter"
+          class="text-white/35 text-[11px] tabular-nums font-medium hidden sm:block"
+        >
+        </p>
         <a
           id="lb-download"
           href="#"
           download
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] sm:text-xs font-semibold transition-all duration-200 border border-white/10 hover:border-white/20"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            class="w-3 h-3"
+          >
             <path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"></path>
           </svg>
           Unduh
@@ -452,27 +575,40 @@ const images = assets.filter((a) => a.type === "IMAGE");
     </div>
   </div>
 
-  <button id="lb-next" class="absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Berikutnya">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 sm:w-6 sm:h-6">
+  <button
+    id="lb-next"
+    class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all duration-200 backdrop-blur-sm border border-white/10"
+    aria-label="Foto berikutnya"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      class="w-5 h-5"
+    >
       <path d="M9 18l6-6-6-6"></path>
     </svg>
   </button>
 </div>
 
 <script>
-  const lb       = document.getElementById("lightbox")!;
-  const lbImg    = document.getElementById("lb-img") as HTMLImageElement;
-  const lbName   = document.getElementById("lb-name")!;
-  const lbMeta   = document.getElementById("lb-meta")!;
-  const lbDl     = document.getElementById("lb-download") as HTMLAnchorElement;
-  const lbCtr    = document.getElementById("lb-counter")!;
+  const lb = document.getElementById("lightbox")!;
+  const lbImg = document.getElementById("lb-img") as HTMLImageElement;
+  const lbName = document.getElementById("lb-name")!;
+  const lbMeta = document.getElementById("lb-meta")!;
+  const lbDl = document.getElementById("lb-download") as HTMLAnchorElement;
+  const lbCtr = document.getElementById("lb-counter")!;
   const btnClose = document.getElementById("lb-close")!;
-  const btnPrev  = document.getElementById("lb-prev")!;
-  const btnNext  = document.getElementById("lb-next")!;
+  const btnPrev = document.getElementById("lb-prev")!;
+  const btnNext = document.getElementById("lb-next")!;
   const backdrop = document.getElementById("lb-backdrop")!;
 
-  const buttons  = Array.from(document.querySelectorAll<HTMLButtonElement>("#photo-grid button"));
-  let current    = 0;
+  const buttons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("#photo-grid button"),
+  );
+  let current = 0;
 
   function open(index: number) {
     current = index;
@@ -489,16 +625,25 @@ const images = assets.filter((a) => a.type === "IMAGE");
   function render() {
     const btn = buttons[current];
     lbImg.style.opacity = "0";
+    lbImg.style.transform = "scale(0.97)";
     lbImg.src = btn.dataset.src!;
     lbImg.alt = btn.dataset.name!;
-    lbImg.onload = () => { lbImg.style.opacity = "1"; };
+    lbImg.onload = () => {
+      lbImg.style.opacity = "1";
+      lbImg.style.transform = "scale(1)";
+    };
     lbName.textContent = btn.dataset.name!;
-    lbMeta.textContent = [btn.dataset.date, btn.dataset.location].filter(Boolean).join(" · ");
-    lbDl.href     = btn.dataset.download!;
+    const meta = [btn.dataset.date, btn.dataset.location]
+      .filter(Boolean)
+      .join("  ·  ");
+    lbMeta.textContent = meta;
+    lbDl.href = btn.dataset.download!;
     lbDl.download = btn.dataset.name!;
     lbCtr.textContent = `${current + 1} / ${buttons.length}`;
+
     btnPrev.style.visibility = current === 0 ? "hidden" : "visible";
-    btnNext.style.visibility = current === buttons.length - 1 ? "hidden" : "visible";
+    btnNext.style.visibility =
+      current === buttons.length - 1 ? "hidden" : "visible";
 
     if (current + 1 < buttons.length) {
       const pre = new Image();
@@ -507,27 +652,61 @@ const images = assets.filter((a) => a.type === "IMAGE");
   }
 
   buttons.forEach((btn, i) => btn.addEventListener("click", () => open(i)));
-  btnPrev.addEventListener("click", () => { if (current > 0) { current--; render(); } });
-  btnNext.addEventListener("click", () => { if (current < buttons.length - 1) { current++; render(); } });
   btnClose.addEventListener("click", close);
   backdrop.addEventListener("click", close);
 
+  btnPrev.addEventListener("click", () => {
+    if (current > 0) {
+      current--;
+      render();
+    }
+  });
+  btnNext.addEventListener("click", () => {
+    if (current < buttons.length - 1) {
+      current++;
+      render();
+    }
+  });
+
   let startX = 0;
-  lb.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; }, { passive: true });
+  let startY = 0;
+  lb.addEventListener(
+    "touchstart",
+    (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    },
+    { passive: true },
+  );
   lb.addEventListener("touchend", (e) => {
     const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dy) > Math.abs(dx)) return;
     if (Math.abs(dx) < 40) return;
-    if (dx < 0 && current < buttons.length - 1) { current++; render(); }
-    if (dx > 0 && current > 0)                  { current--; render(); }
+    if (dx < 0 && current < buttons.length - 1) {
+      current++;
+      render();
+    }
+    if (dx > 0 && current > 0) {
+      current--;
+      render();
+    }
   });
 
   document.addEventListener("keydown", (e) => {
     if (lb.classList.contains("hidden")) return;
-    if (e.key === "Escape")     close();
-    if (e.key === "ArrowLeft"  && current > 0)                  { current--; render(); }
-    if (e.key === "ArrowRight" && current < buttons.length - 1) { current++; render(); }
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft" && current > 0) {
+      current--;
+      render();
+    }
+    if (e.key === "ArrowRight" && current < buttons.length - 1) {
+      current++;
+      render();
+    }
   });
 </script>
+
 ```
 
 ---
@@ -540,72 +719,143 @@ import type { ImmichAlbum } from "../lib/immich";
 import { groupAlbumsByYear } from "../lib/immich";
 
 interface Props {
-    albums: ImmichAlbum[];
-    activeId?: string;
+  albums: ImmichAlbum[];
+  activeId?: string;
 }
 
 const { albums, activeId } = Astro.props;
 const groups = groupAlbumsByYear(albums);
+const SITE_NAME = import.meta.env.SITE_NAME ?? "DOKUMENTASI";
+const siteParts = SITE_NAME.split(" ");
+const siteNameLine1 = siteParts[0] ?? SITE_NAME;
+const siteNameLine2 = siteParts.slice(1).join(" ");
+const currentPath = Astro.url.pathname;
 ---
 
-<aside class="lg:w-64 lg:shrink-0 lg:border-r lg:border-[var(--color-border)] lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto lg:flex lg:flex-col glass">
-  <div class="hidden lg:flex items-center px-5 py-5 border-b border-[var(--glass-border)] shrink-0">
-    <a href="/" class="font-semibold tracking-tight text-[var(--color-fg)] text-base">DOKUMENTASI ROHIS</a>
+<aside
+  class="lg:w-60 xl:w-64 lg:shrink-0 lg:border-r lg:border-[var(--color-border-muted)] lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto lg:flex lg:flex-col glass"
+>
+  <div
+    class="hidden lg:flex items-center gap-2.5 px-4 py-4 border-b border-[var(--glass-border)] shrink-0"
+  >
+    <span
+      class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        stroke-width="2"
+        class="w-3.5 h-3.5"
+      >
+        <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+      </svg>
+    </span>
+    <a
+      href="/"
+      class="font-semibold tracking-tight text-[var(--color-fg)] text-sm leading-tight"
+    >
+      {siteNameLine1}<br />{siteNameLine2}
+    </a>
   </div>
 
-  <details class="lg:hidden border-b border-[var(--color-border)]">
-    <summary class="px-4 py-3 cursor-pointer font-medium select-none text-sm">Album</summary>
-    <nav class="px-3 pb-4 space-y-4">
-      {groups.map((group) => (
-        <div>
-          <p class="px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-fg-muted)] mb-1.5">{group.year}</p>
-          <ul class="space-y-0.5">
-            {group.albums.map((album) => (
-              <li>
-                <a
-                  href={`/gallery/${album.id}`}
-                  class:list={[
-                    "block px-2 py-1.5 rounded-lg text-sm truncate transition-colors",
-                    activeId === album.id
-                      ? "bg-[var(--color-accent)] text-white font-medium"
-                      : "text-[var(--color-fg)] hover:bg-[var(--color-canvas-subtle)]",
-                  ]}
-                >
-                  {album.albumName}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </nav>
-  </details>
+  <div class="hidden lg:block flex-1 overflow-y-auto">
+    <div class="px-3 pt-3 pb-1">
+      <a
+        href="/"
+        class={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors mb-1 ${currentPath === "/" ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)]" : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]"}`}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          class="w-4 h-4 shrink-0"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        </svg>
+        Beranda
+      </a>
+      <a
+        href="/albums"
+        class={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors mb-3 ${currentPath === "/albums" ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)]" : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]"}`}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          class="w-4 h-4 shrink-0"
+        >
+          <path
+            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+          ></path>
+        </svg>
+        Semua Album
+      </a>
+    </div>
 
-  <nav class="hidden lg:block flex-1 px-3 py-4 space-y-5 overflow-y-auto">
-    {groups.map((group) => (
-      <div>
-        <p class="px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-fg-muted)] mb-1.5">{group.year}</p>
-        <ul class="space-y-0.5">
-          {group.albums.map((album) => (
-            <li>
-              <a
-                href={`/gallery/${album.id}`}
-                class:list={[
-                  "block px-2 py-1.5 rounded-lg text-sm truncate transition-colors",
-                  activeId === album.id
-                    ? "bg-[var(--color-accent)] text-white font-medium"
-                    : "text-[var(--color-fg)] hover:bg-[var(--color-canvas-subtle)]",
-                ]}
-              >
-                {album.albumName}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))}
-  </nav>
+    <div class="px-3 pb-4 space-y-5">
+      {
+        groups.map((group) => (
+          <div>
+            <p class="px-2.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-fg-subtle)] mb-1.5 flex items-center gap-1.5">
+              <span class="w-3 h-px bg-[var(--color-border)] inline-block" />
+              {group.year}
+            </p>
+            <ul class="space-y-0.5">
+              {group.albums.map((album) => {
+                const isActive = activeId === album.id;
+                return (
+                  <li>
+                    <a
+                      href={`/albums/${album.id}`}
+                      class={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-sm truncate transition-colors group ${isActive ? "bg-[var(--color-accent)] text-white font-medium shadow-sm" : "text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)]"}`}
+                    >
+                      <span
+                        class={`w-1.5 h-1.5 rounded-full shrink-0 ${isActive ? "bg-white/60" : "bg-[var(--color-border)]"}`}
+                      />
+                      <span class="truncate">{album.albumName}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
 </aside>
+
+```
+
+---
+
+### File: `./src/env.d.ts`
+
+```ts
+interface ImportMetaEnv {
+    readonly IMMICH_BASE_URL: string;
+    readonly IMMICH_API_KEY: string;
+    readonly SITE_NAME: string;
+    readonly SITE_SHORT_NAME: string;
+    readonly SITE_DESCRIPTION: string;
+    readonly ORG_NAME: string;
+    readonly SCHOOL_NAME: string;
+    readonly POWERED_BY: string;
+    readonly POWERED_BY_URL: string;
+}
+
+interface ImportMeta {
+    readonly env: ImportMetaEnv;
+}
 ```
 
 ---
@@ -617,12 +867,30 @@ const groups = groupAlbumsByYear(albums);
 import "../styles/global.css";
 
 interface Props {
-    title?: string;
-    description?: string;
+  title?: string;
+  description?: string;
+  activePath?: string;
 }
 
-const { title = "DOKUMENTASI ROHIS", description = "Dokumentasi kegiatan ROHIS dalam satu tempat." } = Astro.props;
-const ogImage = "/og.png";
+const SITE_NAME = import.meta.env.SITE_NAME ?? "GALERI DOKUMENTASI";
+const SITE_SHORT_NAME = import.meta.env.SITE_SHORT_NAME ?? "DOKUMENTASI";
+const SITE_DESCRIPTION =
+  import.meta.env.SITE_DESCRIPTION ?? "Dokumentasi kegiatan dalam satu tempat.";
+const SCHOOL_NAME =
+  import.meta.env.SCHOOL_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
+const ORG_NAME = import.meta.env.ORG_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
+const POWERED_BY = import.meta.env.POWERED_BY ?? "ZEDLABS TEKNOLOGI INDONESIA";
+const POWERED_BY_URL = import.meta.env.POWERED_BY_URL ?? "https://zedlabs.id";
+
+const {
+  title = SITE_NAME,
+  description = SITE_DESCRIPTION,
+  activePath = Astro.url.pathname,
+} = Astro.props;
+
+const isHome = activePath === "/";
+const isAlbums = activePath.startsWith("/albums");
+const year = new Date().getFullYear();
 ---
 
 <html lang="id">
@@ -630,120 +898,290 @@ const ogImage = "/og.png";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0969da" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="theme-color"
+      content="#0969da"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0d1117"
+      media="(prefers-color-scheme: dark)"
+    />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content="/og.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="DOKUMENTASI ROHIS" />
+    <meta name="apple-mobile-web-app-title" content={SITE_SHORT_NAME} />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>
     <script is:inline>
-      const stored = localStorage.getItem("theme");
-      const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.classList.toggle("dark", (stored ?? (prefersDark ? "dark" : "light")) === "dark");
+      (function () {
+        var s = localStorage.getItem("theme");
+        var d = matchMedia("(prefers-color-scheme: dark)").matches;
+        if ((s ?? (d ? "dark" : "light")) === "dark")
+          document.documentElement.classList.add("dark");
+      })();
     </script>
   </head>
-  <body class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen">
-
-    <div class="lg:flex">
+  <body
+    class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen antialiased"
+  >
+    <div class="lg:flex min-h-screen">
       <slot name="sidebar" />
+
       <div class="flex-1 min-w-0 flex flex-col">
-        <header class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--glass-border)]">
-          <a href="/" class="font-semibold tracking-tight text-[var(--color-fg)]">DOKUMENTASI ROHIS</a>
-          <button
-            id="theme-toggle"
-            type="button"
-            aria-label="Ganti tema"
-            class="p-2 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-canvas-subtle)] transition-colors"
+        <header
+          class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 h-14 border-b border-[var(--glass-border)]"
+        >
+          <a
+            href="/"
+            class="font-semibold tracking-tight text-[var(--color-fg)] text-sm flex items-center gap-2.5"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 hidden dark:block">
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 block dark:hidden">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-          </button>
+            <span
+              class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+                class="w-3.5 h-3.5"
+              >
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            </span>
+            <span class="hidden sm:block">{SITE_NAME}</span>
+            <span class="block sm:hidden">{SITE_SHORT_NAME}</span>
+          </a>
+
+          <div class="flex items-center gap-2">
+            <a
+              href="/albums"
+              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)] transition-colors border border-transparent hover:border-[var(--color-border-muted)]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="w-3.5 h-3.5"
+              >
+                <path
+                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                ></path>
+              </svg>
+              Album
+            </a>
+            <button
+              id="theme-toggle"
+              type="button"
+              aria-label="Ganti tema"
+              class="p-2 rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="w-4 h-4 hidden dark:block"
+              >
+                <circle cx="12" cy="12" r="4"></circle>
+                <path
+                  d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+                ></path>
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="w-4 h-4 block dark:hidden"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+            </button>
+          </div>
         </header>
-        <main class="flex-1">
+
+        <main class="flex-1 pb-16 lg:pb-0">
           <slot />
         </main>
 
-        <footer class="px-6 py-4 text-center text-xs text-[var(--color-fg-muted)] border-t border-[var(--color-border)]">
-          <p>
-            &copy; {new Date().getFullYear()} ROHIS SMKN 1 PANDEGLANG
-          </p>
-          <p class="mt-1 opacity-75">
-            Powered by{" "}
-            <a
-              href="https://zedlabs.id"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="font-medium text-[var(--color-accent)] hover:underline"
-            >
-              ZEDLABS TEKNOLOGI INDONESIA
-            </a>
-          </p>
+        <footer
+          class="hidden lg:block px-6 py-5 border-t border-[var(--color-border-muted)]"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--color-fg-subtle)]"
+          >
+            <p>&copy; {year} {ORG_NAME} {SCHOOL_NAME}</p>
+            <p>
+              Powered by <a
+                href={POWERED_BY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-medium text-[var(--color-accent)] hover:underline"
+                >{POWERED_BY}</a
+              >
+            </p>
+          </div>
         </footer>
-
       </div>
     </div>
 
+    <nav
+      class="fixed bottom-0 left-0 right-0 z-40 lg:hidden glass border-t border-[var(--glass-border)]"
+    >
+      <div class="flex items-stretch justify-around h-14 max-w-sm mx-auto">
+        <a
+          href="/"
+          aria-label="Beranda"
+          class={`flex flex-col items-center justify-center gap-1 flex-1 text-[10px] font-medium transition-colors ${isHome ? "text-[var(--color-accent)]" : "text-[var(--color-fg-muted)]"}`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-5 h-5"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          Beranda
+        </a>
+        <a
+          href="/albums"
+          aria-label="Album"
+          class={`flex flex-col items-center justify-center gap-1 flex-1 text-[10px] font-medium transition-colors ${isAlbums ? "text-[var(--color-accent)]" : "text-[var(--color-fg-muted)]"}`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-5 h-5"
+          >
+            <path
+              d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+            ></path>
+          </svg>
+          Album
+        </a>
+      </div>
+    </nav>
+
     <div
       id="install-banner"
-      class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm glass rounded-2xl px-5 py-4 shadow-xl border border-[var(--glass-border)] hidden"
+      class="fixed bottom-20 lg:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2.5rem)] max-w-sm"
+      aria-live="polite"
     >
-      <p class="text-sm font-medium text-[var(--color-fg)] mb-3">Install DOKUMENTASI ROHIS ke layar utama?</p>
-      <div class="flex gap-2">
-        <button id="install-btn" class="flex-1 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity">Install</button>
-        <button id="install-dismiss" class="flex-1 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] transition-colors">Nanti</button>
+      <div
+        class="glass rounded-2xl px-5 py-4 shadow-[var(--shadow-lg)] border border-[var(--glass-border)]"
+      >
+        <div class="flex items-start gap-3 mb-3">
+          <span
+            class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--color-accent)] shrink-0 mt-0.5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              stroke-width="2"
+              class="w-4 h-4"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+            </svg>
+          </span>
+          <div>
+            <p
+              class="text-sm font-semibold text-[var(--color-fg)] leading-tight"
+            >
+              Install Aplikasi
+            </p>
+            <p class="text-xs text-[var(--color-fg-muted)] mt-0.5">
+              Akses dokumentasi {ORG_NAME} lebih cepat langsung dari layar utama.
+            </p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button
+            id="install-btn"
+            class="flex-1 py-2 rounded-xl bg-[var(--color-accent)] text-white text-xs font-semibold hover:opacity-90 active:scale-95 transition-all"
+            >Install</button
+          >
+          <button
+            id="install-dismiss"
+            class="flex-1 py-2 rounded-xl border border-[var(--color-border)] text-xs text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] active:scale-95 transition-all"
+            >Nanti</button
+          >
+        </div>
       </div>
     </div>
 
     <script is:inline>
-      document.getElementById("theme-toggle").addEventListener("click", () => {
-        const isDark = document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-      });
+      document
+        .getElementById("theme-toggle")
+        .addEventListener("click", function () {
+          var isDark = document.documentElement.classList.toggle("dark");
+          localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
 
-      let deferredPrompt;
-      const banner   = document.getElementById("install-banner");
-      const btnInst  = document.getElementById("install-btn");
-      const btnDism  = document.getElementById("install-dismiss");
+      var deferredPrompt = null;
+      var banner = document.getElementById("install-banner");
+      var btnInst = document.getElementById("install-btn");
+      var btnDism = document.getElementById("install-dismiss");
 
-      window.addEventListener("beforeinstallprompt", (e) => {
+      window.addEventListener("beforeinstallprompt", function (e) {
         e.preventDefault();
         deferredPrompt = e;
         if (!localStorage.getItem("pwa-dismissed")) {
-          banner.classList.remove("hidden");
-          requestAnimationFrame(() => banner.classList.add("show"));
+          setTimeout(function () {
+            banner.classList.add("show");
+          }, 2000);
         }
       });
 
-      btnInst && btnInst.addEventListener("click", async () => {
+      function hideBanner() {
         banner.classList.remove("show");
-        setTimeout(() => banner.classList.add("hidden"), 350);
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          await deferredPrompt.userChoice;
-          deferredPrompt = null;
-        }
-      });
+      }
 
-      btnDism && btnDism.addEventListener("click", () => {
-        banner.classList.remove("show");
-        setTimeout(() => banner.classList.add("hidden"), 350);
-        localStorage.setItem("pwa-dismissed", "1");
-      });
+      btnInst &&
+        btnInst.addEventListener("click", async function () {
+          hideBanner();
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+          }
+        });
+
+      btnDism &&
+        btnDism.addEventListener("click", function () {
+          hideBanner();
+          localStorage.setItem("pwa-dismissed", "1");
+        });
     </script>
   </body>
 </html>
+
 ```
 
 ---
@@ -754,10 +1192,12 @@ const ogImage = "/og.png";
 const BASE_URL = import.meta.env.IMMICH_BASE_URL;
 const API_KEY = import.meta.env.IMMICH_API_KEY;
 
-const headers = {
+const HEADERS = {
     "x-api-key": API_KEY,
     "Content-Type": "application/json",
 };
+
+const EXCLUDED_ALBUM_KEYWORDS = ["UNGGAH DOKUMENTASI"];
 
 export interface ImmichAlbum {
     id: string;
@@ -780,6 +1220,8 @@ export interface ImmichAsset {
         description?: string;
         city?: string;
         country?: string;
+        make?: string;
+        model?: string;
     };
 }
 
@@ -787,22 +1229,26 @@ export interface ImmichAlbumDetail extends ImmichAlbum {
     assets: ImmichAsset[];
 }
 
+export function isExcludedAlbum(album: ImmichAlbum): boolean {
+    return EXCLUDED_ALBUM_KEYWORDS.some((kw) =>
+        album.albumName.toUpperCase().includes(kw.toUpperCase())
+    );
+}
+
 export async function getAllAlbums(): Promise<ImmichAlbum[]> {
-    const res = await fetch(`${BASE_URL}/api/albums`, { headers });
+    const res = await fetch(`${BASE_URL}/api/albums?shared=true`, { headers: HEADERS });
     if (!res.ok) throw new Error(`Gagal fetch albums: ${res.statusText}`);
-    return res.json();
+    const all: ImmichAlbum[] = await res.json();
+    return all.filter((a) => a.shared && !isExcludedAlbum(a));
 }
 
 export async function getAlbumById(albumId: string): Promise<ImmichAlbumDetail> {
-    const res = await fetch(`${BASE_URL}/api/albums/${albumId}`, { headers });
+    const res = await fetch(`${BASE_URL}/api/albums/${albumId}`, { headers: HEADERS });
     if (!res.ok) throw new Error(`Gagal fetch album ${albumId}: ${res.statusText}`);
     return res.json();
 }
 
-export function getThumbnailUrl(
-    assetId: string,
-    size: "thumbnail" | "preview" = "thumbnail"
-): string {
+export function getThumbnailUrl(assetId: string, size: "thumbnail" | "preview" = "thumbnail"): string {
     return `/api/img?id=${assetId}&size=${size}`;
 }
 
@@ -811,7 +1257,7 @@ export function getDownloadUrl(assetId: string): string {
 }
 
 export function getAlbumShareUrl(albumId: string): string {
-    return `${BASE_URL}/share/${albumId}`;
+    return `${BASE_URL}/s/${albumId}`;
 }
 
 export function getAlbumCoverUrl(album: ImmichAlbum): string | null {
@@ -819,24 +1265,18 @@ export function getAlbumCoverUrl(album: ImmichAlbum): string | null {
     return getThumbnailUrl(album.albumThumbnailAssetId, "preview");
 }
 
-export async function getRecentAssets(limit = 24): Promise<ImmichAsset[]> {
+export async function getRecentAssets(limit = 30): Promise<ImmichAsset[]> {
     const albums = await getAllAlbums();
     const sorted = [...albums].sort(
         (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
-
-    const results = await Promise.all(
-        sorted.slice(0, 6).map((a) => getAlbumById(a.id))
-    );
-
+    const results = await Promise.all(sorted.map((a) => getAlbumById(a.id)));
     return results
         .flatMap((d) => d.assets.filter((a) => a.type === "IMAGE"))
         .slice(0, limit);
 }
 
-export function groupAlbumsByYear(
-    albums: ImmichAlbum[]
-): { year: string; albums: ImmichAlbum[] }[] {
+export function groupAlbumsByYear(albums: ImmichAlbum[]): { year: string; albums: ImmichAlbum[] }[] {
     const map = new Map<string, ImmichAlbum[]>();
     for (const album of albums) {
         const year = new Date(album.createdAt).getFullYear().toString();
@@ -852,7 +1292,7 @@ export function groupAlbumsByYear(
 
 ---
 
-### File: `./src/pages/album/index.astro`
+### File: `./src/pages/albums/index.astro`
 
 ```astro
 ---
@@ -861,90 +1301,279 @@ import Sidebar from "../../components/Sidebar.astro";
 import AlbumGrid from "../../components/AlbumGrid.astro";
 import { getAllAlbums } from "../../lib/immich";
 
+const SITE_NAME = import.meta.env.SITE_NAME ?? "DOKUMENTASI";
 const albums = await getAllAlbums();
 ---
 
-<Layout title="Album - DOKUMENTASI ROHIS">
+<Layout title={`Album — ${SITE_NAME}`} activePath="/albums">
   <Sidebar slot="sidebar" albums={albums} />
 
-  <section class="px-4 sm:px-8 py-10">
-    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight mb-6">Semua Album</h1>
+  <section class="px-5 sm:px-8 py-10">
+    <div class="flex items-baseline gap-3 mb-6">
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+        Semua Album
+      </h1>
+      <span class="text-sm text-[var(--color-fg-muted)] font-medium"
+        >{albums.length} Album Publik</span
+      >
+    </div>
     <AlbumGrid albums={albums} />
   </section>
 </Layout>
+
 ```
 
 ---
 
-### File: `./src/pages/album/[albumId].astro`
+### File: `./src/pages/albums/[albumId].astro`
 
 ```astro
 ---
 export const prerender = false;
 
-import { getAllAlbums, getAlbumById, getAlbumShareUrl } from "../../lib/immich";
+import { getAllAlbums, getAlbumById, isExcludedAlbum } from "../../lib/immich";
 import Lightbox from "../../components/Lightbox.astro";
 import Layout from "../../layouts/Layout.astro";
 import Sidebar from "../../components/Sidebar.astro";
 
-const { albumId } = Astro.params;
+const SITE_NAME = import.meta.env.SITE_NAME ?? "GALERI DOKUMENTASI";
 
-if (!albumId) return Astro.redirect("/gallery");
+const { albumId } = Astro.params;
+if (!albumId) return Astro.redirect("/albums");
 
 let album, albums;
 try {
-    [album, albums] = await Promise.all([
-        getAlbumById(albumId),
-        getAllAlbums(),
-    ]);
+  [album, albums] = await Promise.all([getAlbumById(albumId), getAllAlbums()]);
 } catch {
-    return Astro.redirect("/gallery");
+  return Astro.redirect("/albums");
 }
+
+if (!album.shared || isExcludedAlbum(album)) return Astro.redirect("/albums");
+
+const imageCount = album.assets.filter((a) => a.type === "IMAGE").length;
+const albumDate = new Date(album.createdAt).toLocaleDateString("id-ID", {
+  dateStyle: "long",
+});
+const pageUrl = Astro.url.href;
+const shareTitle = `${album.albumName} — ${SITE_NAME}`;
+const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + "\n" + pageUrl)}`;
+const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
 ---
 
-<Layout title={`${album.albumName} - DOKUMENTASI ROHIS`}>
+<Layout
+  title={`${album.albumName} — ${SITE_NAME}`}
+  description={album.description || `${album.albumName} — ${imageCount} foto`}
+  activePath={`/albums/${albumId}`}
+>
   <Sidebar slot="sidebar" albums={albums} activeId={album.id} />
 
-  <div class="px-4 sm:px-6 py-10">
+  <div class="px-5 sm:px-7 py-10">
     <a
-      href="/gallery"
-      class="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-fg-muted)] hover:text-[var(--color-accent)] transition-colors mb-6"
+      href="/albums"
+      class="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-fg-muted)] hover:text-[var(--color-accent)] transition-colors mb-8 group"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        class="w-3 h-3 group-hover:-translate-x-0.5 transition-transform"
+      >
         <path d="M15 18l-6-6 6-6"></path>
       </svg>
       Kembali ke Album
     </a>
 
-    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">{album.albumName}</h1>
+    <div class="mb-8">
+      <h1
+        class="text-2xl sm:text-3xl font-semibold tracking-tight leading-snug mb-2"
+      >
+        {album.albumName}
+      </h1>
+      {
+        album.description && (
+          <p class="text-[var(--color-fg-muted)] text-sm leading-relaxed max-w-lg mb-4">
+            {album.description}
+          </p>
+        )
+      }
 
-    {album.description && (
-      <p class="text-[var(--color-fg-muted)] mt-2">{album.description}</p>
-    )}
+      <div class="flex items-center gap-2.5 flex-wrap mb-4">
+        <span
+          class="inline-flex items-center gap-1.5 text-xs text-[var(--color-fg-muted)] bg-[var(--color-canvas-subtle)] border border-[var(--color-border-muted)] px-2.5 py-1 rounded-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-3 h-3"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <path d="M21 15l-5-5L5 21"></path>
+          </svg>
+          {imageCount} Foto
+        </span>
+        <span
+          class="inline-flex items-center gap-1.5 text-xs text-[var(--color-fg-muted)] bg-[var(--color-canvas-subtle)] border border-[var(--color-border-muted)] px-2.5 py-1 rounded-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-3 h-3"
+          >
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          {albumDate}
+        </span>
+      </div>
 
-    <div class="flex items-center gap-4 mt-3">
-      <span class="text-sm text-[var(--color-fg-muted)]">{album.assetCount} foto</span>
-      {album.shared && (
+      <div class="flex items-center gap-2 flex-wrap">
         <a
-          href={getAlbumShareUrl(album.id)}
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-white text-sm hover:opacity-90 transition-opacity"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-semibold transition-all active:scale-95 shadow-sm"
+          style="background-color:#25D366"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
-            <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"></path>
-            <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"></path>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="w-3.5 h-3.5"
+          >
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
+            ></path>
+            <path
+              d="M12 0C5.373 0 0 5.373 0 12c0 2.117.554 4.103 1.523 5.824L.057 23.882a.5.5 0 0 0 .614.632l6.284-1.634A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.519-5.21-1.42l-.374-.222-3.878 1.009 1.049-3.756-.245-.388A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"
+            ></path>
           </svg>
-          Share Link
+          WhatsApp
         </a>
-      )}
+
+        <a
+          href={fbUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-semibold transition-all active:scale-95 shadow-sm"
+          style="background-color:#1877F2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="w-3.5 h-3.5"
+          >
+            <path
+              d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.791-4.697 4.533-4.697 1.313 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"
+            ></path>
+          </svg>
+          Facebook
+        </a>
+
+        <button
+          id="btn-native-share"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-canvas-subtle)] border border-[var(--color-border-muted)] text-[var(--color-fg)] text-xs font-semibold hover:bg-[var(--color-canvas-inset)] transition-all active:scale-95"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-3.5 h-3.5"
+          >
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"></path>
+          </svg>
+          Bagikan
+        </button>
+
+        <button
+          id="btn-copy-link"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-canvas-subtle)] border border-[var(--color-border-muted)] text-[var(--color-fg)] text-xs font-semibold hover:bg-[var(--color-canvas-inset)] transition-all active:scale-95"
+        >
+          <svg
+            id="icon-copy"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-3.5 h-3.5"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+            ></path>
+          </svg>
+          <svg
+            id="icon-check"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            class="w-3.5 h-3.5 hidden"
+            style="color:var(--color-success)"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span id="copy-label">Salin Tautan</span>
+        </button>
+      </div>
     </div>
 
-    <div class="mt-8">
-      <Lightbox assets={album.assets} />
-    </div>
+    <Lightbox assets={album.assets} />
   </div>
 </Layout>
+
+<script>
+  const pageUrl = window.location.href;
+  const albumName = document.querySelector("h1")?.textContent?.trim() ?? "";
+
+  const btnShare = document.getElementById("btn-native-share");
+  if (!navigator.share) {
+    btnShare?.classList.add("hidden");
+  } else {
+    btnShare?.addEventListener("click", async () => {
+      try {
+        await navigator.share({ title: albumName, url: pageUrl });
+      } catch {}
+    });
+  }
+
+  const btnCopy = document.getElementById("btn-copy-link");
+  const iconCopy = document.getElementById("icon-copy");
+  const iconCheck = document.getElementById("icon-check");
+  const copyLabel = document.getElementById("copy-label");
+
+  btnCopy?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      iconCopy?.classList.add("hidden");
+      iconCheck?.classList.remove("hidden");
+      if (copyLabel) copyLabel.textContent = "Tersalin!";
+      setTimeout(() => {
+        iconCopy?.classList.remove("hidden");
+        iconCheck?.classList.add("hidden");
+        if (copyLabel) copyLabel.textContent = "Salin Tautan";
+      }, 2000);
+    } catch {}
+  });
+</script>
+
 ```
 
 ---
@@ -1003,33 +1632,152 @@ import InfiniteSlider from "../components/InfiniteSlider.astro";
 import AlbumGrid from "../components/AlbumGrid.astro";
 import { getAllAlbums, getRecentAssets } from "../lib/immich";
 
+const SITE_DESCRIPTION =
+  import.meta.env.SITE_DESCRIPTION ?? "Dokumentasi kegiatan dalam satu tempat.";
+const ORG_NAME = import.meta.env.ORG_NAME ?? "DOKUMENTASI";
+const SCHOOL_NAME =
+  import.meta.env.SCHOOL_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
+
 const [albums, recentAssets] = await Promise.all([
-    getAllAlbums(),
-    getRecentAssets(24),
+  getAllAlbums(),
+  getRecentAssets(30),
 ]);
+
+const totalPhotos = albums.reduce((s, a) => s + a.assetCount, 0);
 ---
 
-<Layout title="DOKUMENTASI ROHIS">
+<Layout activePath="/">
   <Sidebar slot="sidebar" albums={albums} />
 
-  <section class="px-4 sm:px-8 pt-10 pb-4">
-    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight mb-1">Semua Kegiatan</h1>
-    <p class="text-sm text-[var(--color-fg-muted)]">Dokumentasi kegiatan dalam satu tempat.</p>
+  <section class="px-5 sm:px-8 pt-10 pb-6">
+    <div class="max-w-2xl">
+      <p
+        class="text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)] mb-2"
+      >
+        Dokumentasi Kegiatan
+      </p>
+      <!-- <h1
+        class="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--color-fg)] mb-2 leading-tight"
+      >
+        Semua kegiatan {ORG_NAME}<br />dalam satu tempat.
+      </h1> -->
+      <p class="text-sm text-[var(--color-fg-muted)] leading-relaxed">
+        {SITE_DESCRIPTION} &mdash; {SCHOOL_NAME}.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-5 mt-6 flex-wrap">
+      <div class="flex items-baseline gap-1.5">
+        <span
+          class="text-2xl sm:text-3xl font-bold tabular-nums text-[var(--color-fg)]"
+          >{albums.length}</span
+        >
+        <span class="text-xs text-[var(--color-fg-muted)] font-medium"
+          >Album Publik</span
+        >
+      </div>
+      <div class="w-px h-6 bg-[var(--color-border)]"></div>
+      <div class="flex items-baseline gap-1.5">
+        <span
+          class="text-2xl sm:text-3xl font-bold tabular-nums text-[var(--color-fg)]"
+          >{totalPhotos.toLocaleString("id-ID")}</span
+        >
+        <span class="text-xs text-[var(--color-fg-muted)] font-medium"
+          >Foto</span
+        >
+      </div>
+      <div class="w-px h-6 bg-[var(--color-border)]"></div>
+      <a
+        href="/albums"
+        class="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-accent)] hover:underline"
+      >
+        Lihat semua album
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          class="w-3 h-3"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7"></path>
+        </svg>
+      </a>
+    </div>
   </section>
 
-  {recentAssets.length > 0 && <InfiniteSlider assets={recentAssets} />}
+  {
+    recentAssets.length > 0 && (
+      <div class="border-y border-[var(--color-border-muted)] bg-[var(--color-canvas-subtle)]">
+        <InfiniteSlider assets={recentAssets} />
+      </div>
+    )
+  }
 
-  <section class="px-4 sm:px-8 py-8">
-    <h2 class="text-base font-semibold mb-4 text-[var(--color-fg-muted)] uppercase tracking-widest text-xs">Semua Album</h2>
+  <section class="px-5 sm:px-8 py-8">
+    <div class="flex items-center justify-between mb-5">
+      <h2
+        class="text-xs font-semibold uppercase tracking-widest text-[var(--color-fg-subtle)]"
+      >
+        Album Publik
+      </h2>
+      <a
+        href="/albums"
+        class="text-xs text-[var(--color-accent)] font-medium hover:underline"
+        >Lihat semua</a
+      >
+    </div>
     <AlbumGrid albums={albums} />
   </section>
 </Layout>
 
 <script is:inline>
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js");
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js");
+    });
   }
 </script>
+
+```
+
+---
+
+### File: `./src/pages/manifest.webmanifest.ts`
+
+```ts
+export const prerender = true;
+import type { APIRoute } from "astro";
+
+const NAME = import.meta.env.SITE_NAME ?? "GALERI DOKUMENTASI";
+const SHORT = import.meta.env.SITE_SHORT_NAME ?? "DOKUMENTASI";
+const DESC = import.meta.env.SITE_DESCRIPTION ?? "Dokumentasi kegiatan dalam satu tempat.";
+
+export const GET: APIRoute = () => {
+    const manifest = {
+        name: NAME,
+        short_name: SHORT,
+        description: DESC,
+        start_url: "/",
+        display: "standalone",
+        background_color: "#ffffff",
+        theme_color: "#0969da",
+        orientation: "portrait-primary",
+        icons: [
+            { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+            { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
+        ],
+        screenshots: [
+            { src: "/og.png", sizes: "1200x630", type: "image/png", form_factor: "wide" },
+        ],
+    };
+    return new Response(JSON.stringify(manifest, null, 2), {
+        headers: {
+            "Content-Type": "application/manifest+json",
+            "Cache-Control": "public, max-age=86400",
+        },
+    });
+};
 ```
 
 ---
@@ -1046,25 +1794,41 @@ const [albums, recentAssets] = await Promise.all([
 :root {
     --color-canvas: #ffffff;
     --color-canvas-subtle: #f6f8fa;
+    --color-canvas-inset: #f0f2f5;
     --color-border: #d0d7de;
+    --color-border-muted: #e4e8ec;
     --color-fg: #1f2328;
     --color-fg-muted: #656d76;
+    --color-fg-subtle: #8c959f;
     --color-accent: #0969da;
+    --color-accent-hover: #0757ba;
     --color-accent-subtle: #ddf4ff;
-    --glass-bg: rgba(246, 248, 250, 0.72);
-    --glass-border: rgba(208, 215, 222, 0.6);
+    --color-success: #1a7f37;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(208, 215, 222, 0.55);
+    --shadow-sm: 0 1px 3px rgba(31, 35, 40, 0.08), 0 1px 2px rgba(31, 35, 40, 0.06);
+    --shadow-md: 0 4px 16px rgba(31, 35, 40, 0.10), 0 2px 6px rgba(31, 35, 40, 0.06);
+    --shadow-lg: 0 12px 40px rgba(31, 35, 40, 0.14), 0 4px 12px rgba(31, 35, 40, 0.08);
 }
 
 .dark {
     --color-canvas: #0d1117;
     --color-canvas-subtle: #161b22;
+    --color-canvas-inset: #010409;
     --color-border: #30363d;
+    --color-border-muted: #21262d;
     --color-fg: #e6edf3;
     --color-fg-muted: #8b949e;
+    --color-fg-subtle: #6e7681;
     --color-accent: #58a6ff;
+    --color-accent-hover: #79b8ff;
     --color-accent-subtle: #121d2f;
-    --glass-bg: rgba(22, 27, 34, 0.72);
-    --glass-border: rgba(48, 54, 61, 0.6);
+    --color-success: #3fb950;
+    --glass-bg: rgba(22, 27, 34, 0.78);
+    --glass-border: rgba(48, 54, 61, 0.65);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 *,
@@ -1081,33 +1845,39 @@ body {
     font-family: "Lexend", system-ui, sans-serif;
     background-color: var(--color-canvas);
     color: var(--color-fg);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
     border: 1px solid var(--glass-border);
 }
 
 .glossy-card {
     position: relative;
-    background: linear-gradient(135deg,
-            color-mix(in srgb, var(--color-canvas-subtle) 92%, transparent),
-            color-mix(in srgb, var(--color-canvas) 70%, transparent));
-    border: 1px solid var(--color-border);
-    box-shadow:
-        inset 0 1px 0 0 color-mix(in srgb, white 8%, transparent),
-        0 4px 16px -6px rgba(0, 0, 0, 0.18);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    background: var(--color-canvas-subtle);
+    border: 1px solid var(--color-border-muted);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
 }
 
 .glossy-card:hover {
-    box-shadow:
-        inset 0 1px 0 0 color-mix(in srgb, white 12%, transparent),
-        0 8px 28px -8px rgba(0, 0, 0, 0.28);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-border);
+}
+
+.glossy-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .zigzag-row {
@@ -1117,16 +1887,17 @@ body {
 
 .zigzag-track {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.625rem;
     width: max-content;
+    will-change: transform;
 }
 
 .zigzag-left {
-    animation: scroll-left 40s linear infinite;
+    animation: scroll-left 45s linear infinite;
 }
 
 .zigzag-right {
-    animation: scroll-right 40s linear infinite;
+    animation: scroll-right 45s linear infinite;
 }
 
 @keyframes scroll-left {
@@ -1157,34 +1928,20 @@ body {
     }
 }
 
-.lb-fade-enter {
-    animation: lb-in 0.18s ease forwards;
-}
-
-@keyframes lb-in {
-    from {
-        opacity: 0;
-        transform: scale(0.97);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
 #install-banner {
-    transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateY(calc(100% + 1.5rem));
+    transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.38s ease;
+    opacity: 0;
 }
 
 #install-banner.show {
     transform: translateY(0);
+    opacity: 1;
 }
 
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1198,6 +1955,11 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--color-fg-muted);
+}
+
+::selection {
+    background: var(--color-accent-subtle);
+    color: var(--color-fg);
 }
 ```
 

@@ -3,54 +3,111 @@ import type { ImmichAlbum } from "../lib/immich";
 import { getAlbumCoverUrl } from "../lib/immich";
 
 interface Props {
-    albums: ImmichAlbum[];
+  albums: ImmichAlbum[];
 }
 
 const { albums } = Astro.props;
 
 function spanFor(index: number): string {
-    const p = index % 7;
-    if (p === 0) return "sm:col-span-2 sm:row-span-2";
-    if (p === 3) return "sm:col-span-2";
-    return "";
+  const p = index % 9;
+  if (p === 0) return "sm:col-span-2 sm:row-span-2";
+  if (p === 4) return "sm:col-span-2";
+  if (p === 7) return "sm:col-span-2";
+  return "";
 }
 
 const items = albums.map((album, i) => ({
-    album,
-    href: "/gallery/" + album.id,
-    cover: getAlbumCoverUrl(album),
-    span: spanFor(i),
+  album,
+  href: "/albums/" + album.id,
+  cover: getAlbumCoverUrl(album),
+  span: spanFor(i),
 }));
 ---
 
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 auto-rows-[160px] sm:auto-rows-[180px]">
-  {items.map((item) => (
-    <a
-      href={item.href}
-      class:list={["group relative overflow-hidden rounded-2xl glossy-card", item.span]}
-    >
-      {item.cover ? (
-        <img
-          src={item.cover}
-          alt={item.album.albumName}
-          loading="lazy"
-          decoding="async"
-          class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-      ) : (
-        <div class="absolute inset-0 flex items-center justify-center bg-[var(--color-canvas-subtle)]">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8 text-[var(--color-fg-muted)]">
-            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <path d="M21 15l-5-5L5 21"></path>
-          </svg>
-        </div>
-      )}
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-      <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 text-white">
-        <h3 class="font-medium text-sm sm:text-base leading-tight truncate">{item.album.albumName}</h3>
-        <span class="text-xs text-white/60 mt-0.5 block">{item.album.assetCount} foto</span>
+{
+  albums.length === 0 ? (
+    <div class="flex flex-col items-center justify-center py-24 gap-4 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-[var(--color-canvas-subtle)] border border-[var(--color-border)] flex items-center justify-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          class="w-6 h-6 text-[var(--color-fg-subtle)]"
+        >
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+        </svg>
       </div>
-    </a>
-  ))}
-</div>
+      <p class="text-sm text-[var(--color-fg-muted)] font-medium">
+        Belum ada data
+      </p>
+    </div>
+  ) : (
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 auto-rows-[150px] sm:auto-rows-[175px]">
+      {items.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            "group relative overflow-hidden rounded-2xl glossy-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2",
+            item.span,
+          ]}
+        >
+          {item.cover ? (
+            <img
+              src={item.cover}
+              alt={item.album.albumName}
+              loading="lazy"
+              decoding="async"
+              class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+            />
+          ) : (
+            <div class="absolute inset-0 flex items-center justify-center bg-[var(--color-canvas-inset)]">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                class="w-8 h-8 text-[var(--color-fg-subtle)]"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="M21 15l-5-5L5 21" />
+              </svg>
+            </div>
+          )}
+          <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent group-hover:from-black/80 transition-all duration-300" />
+          <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-3.5 text-white z-10">
+            <h3 class="font-semibold text-sm sm:text-[0.9rem] leading-snug line-clamp-2">
+              {item.album.albumName}
+            </h3>
+            <span class="text-[11px] text-white/55 mt-0.5 block">
+              {item.album.assetCount} foto
+            </span>
+          </div>
+          {item.album.shared && (
+            <div class="absolute top-2.5 right-2.5 z-10">
+              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 backdrop-blur-sm text-[10px] font-medium text-white/80">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  class="w-2.5 h-2.5"
+                >
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
+                </svg>
+                Publik
+              </span>
+            </div>
+          )}
+        </a>
+      ))}
+    </div>
+  )
+}

@@ -2,12 +2,30 @@
 import "../styles/global.css";
 
 interface Props {
-    title?: string;
-    description?: string;
+  title?: string;
+  description?: string;
+  activePath?: string;
 }
 
-const { title = "DOKUMENTASI ROHIS", description = "Dokumentasi kegiatan ROHIS dalam satu tempat." } = Astro.props;
-const ogImage = "/og.png";
+const SITE_NAME = import.meta.env.SITE_NAME ?? "GALERI DOKUMENTASI";
+const SITE_SHORT_NAME = import.meta.env.SITE_SHORT_NAME ?? "DOKUMENTASI";
+const SITE_DESCRIPTION =
+  import.meta.env.SITE_DESCRIPTION ?? "Dokumentasi kegiatan dalam satu tempat.";
+const SCHOOL_NAME =
+  import.meta.env.SCHOOL_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
+const ORG_NAME = import.meta.env.ORG_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
+const POWERED_BY = import.meta.env.POWERED_BY ?? "ZEDLABS TEKNOLOGI INDONESIA";
+const POWERED_BY_URL = import.meta.env.POWERED_BY_URL ?? "https://zedlabs.id";
+
+const {
+  title = SITE_NAME,
+  description = SITE_DESCRIPTION,
+  activePath = Astro.url.pathname,
+} = Astro.props;
+
+const isHome = activePath === "/";
+const isAlbums = activePath.startsWith("/albums");
+const year = new Date().getFullYear();
 ---
 
 <html lang="id">
@@ -15,117 +33,286 @@ const ogImage = "/og.png";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0969da" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="theme-color"
+      content="#0969da"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0d1117"
+      media="(prefers-color-scheme: dark)"
+    />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content="/og.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="DOKUMENTASI ROHIS" />
+    <meta name="apple-mobile-web-app-title" content={SITE_SHORT_NAME} />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>
     <script is:inline>
-      const stored = localStorage.getItem("theme");
-      const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.classList.toggle("dark", (stored ?? (prefersDark ? "dark" : "light")) === "dark");
+      (function () {
+        var s = localStorage.getItem("theme");
+        var d = matchMedia("(prefers-color-scheme: dark)").matches;
+        if ((s ?? (d ? "dark" : "light")) === "dark")
+          document.documentElement.classList.add("dark");
+      })();
     </script>
   </head>
-  <body class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen">
-
-    <div class="lg:flex">
+  <body
+    class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen antialiased"
+  >
+    <div class="lg:flex min-h-screen">
       <slot name="sidebar" />
+
       <div class="flex-1 min-w-0 flex flex-col">
-        <header class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--glass-border)]">
-          <a href="/" class="font-semibold tracking-tight text-[var(--color-fg)]">DOKUMENTASI ROHIS</a>
-          <button
-            id="theme-toggle"
-            type="button"
-            aria-label="Ganti tema"
-            class="p-2 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-canvas-subtle)] transition-colors"
+        <header
+          class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 h-14 border-b border-[var(--glass-border)]"
+        >
+          <a
+            href="/"
+            class="font-semibold tracking-tight text-[var(--color-fg)] text-sm flex items-center gap-2.5"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 hidden dark:block">
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 block dark:hidden">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-          </button>
+            <span
+              class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+                class="w-3.5 h-3.5"
+              >
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            </span>
+            <span class="hidden sm:block">{SITE_NAME}</span>
+            <span class="block sm:hidden">{SITE_SHORT_NAME}</span>
+          </a>
+
+          <div class="flex items-center gap-2">
+            <a
+              href="/albums"
+              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] hover:text-[var(--color-fg)] transition-colors border border-transparent hover:border-[var(--color-border-muted)]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="w-3.5 h-3.5"
+              >
+                <path
+                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                ></path>
+              </svg>
+              Album
+            </a>
+            <button
+              id="theme-toggle"
+              type="button"
+              aria-label="Ganti tema"
+              class="p-2 rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="w-4 h-4 hidden dark:block"
+              >
+                <circle cx="12" cy="12" r="4"></circle>
+                <path
+                  d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+                ></path>
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="w-4 h-4 block dark:hidden"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                ></path>
+              </svg>
+            </button>
+          </div>
         </header>
-        <main class="flex-1">
+
+        <main class="flex-1 pb-16 lg:pb-0">
           <slot />
         </main>
 
-        <footer class="px-6 py-4 text-center text-xs text-[var(--color-fg-muted)] border-t border-[var(--color-border)]">
-          <p>
-            &copy; {new Date().getFullYear()} ROHIS SMKN 1 PANDEGLANG
-          </p>
-          <p class="mt-1 opacity-75">
-            Powered by{" "}
-            <a
-              href="https://zedlabs.id"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="font-medium text-[var(--color-accent)] hover:underline"
-            >
-              ZEDLABS TEKNOLOGI INDONESIA
-            </a>
-          </p>
+        <footer
+          class="hidden lg:block px-6 py-5 border-t border-[var(--color-border-muted)]"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--color-fg-subtle)]"
+          >
+            <p>&copy; {year} {ORG_NAME} {SCHOOL_NAME}</p>
+            <p>
+              Powered by <a
+                href={POWERED_BY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-medium text-[var(--color-accent)] hover:underline"
+                >{POWERED_BY}</a
+              >
+            </p>
+          </div>
         </footer>
-
       </div>
     </div>
 
+    <nav
+      class="fixed bottom-0 left-0 right-0 z-40 lg:hidden glass border-t border-[var(--glass-border)]"
+    >
+      <div class="flex items-stretch justify-around h-14 max-w-sm mx-auto">
+        <a
+          href="/"
+          aria-label="Beranda"
+          class={`flex flex-col items-center justify-center gap-1 flex-1 text-[10px] font-medium transition-colors ${isHome ? "text-[var(--color-accent)]" : "text-[var(--color-fg-muted)]"}`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-5 h-5"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          Beranda
+        </a>
+        <a
+          href="/albums"
+          aria-label="Album"
+          class={`flex flex-col items-center justify-center gap-1 flex-1 text-[10px] font-medium transition-colors ${isAlbums ? "text-[var(--color-accent)]" : "text-[var(--color-fg-muted)]"}`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="w-5 h-5"
+          >
+            <path
+              d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+            ></path>
+          </svg>
+          Album
+        </a>
+      </div>
+    </nav>
+
     <div
       id="install-banner"
-      class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm glass rounded-2xl px-5 py-4 shadow-xl border border-[var(--glass-border)] hidden"
+      class="fixed bottom-20 lg:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2.5rem)] max-w-sm"
+      aria-live="polite"
     >
-      <p class="text-sm font-medium text-[var(--color-fg)] mb-3">Install DOKUMENTASI ROHIS ke layar utama?</p>
-      <div class="flex gap-2">
-        <button id="install-btn" class="flex-1 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity">Install</button>
-        <button id="install-dismiss" class="flex-1 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] transition-colors">Nanti</button>
+      <div
+        class="glass rounded-2xl px-5 py-4 shadow-[var(--shadow-lg)] border border-[var(--glass-border)]"
+      >
+        <div class="flex items-start gap-3 mb-3">
+          <span
+            class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--color-accent)] shrink-0 mt-0.5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              stroke-width="2"
+              class="w-4 h-4"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+            </svg>
+          </span>
+          <div>
+            <p
+              class="text-sm font-semibold text-[var(--color-fg)] leading-tight"
+            >
+              Install Aplikasi
+            </p>
+            <p class="text-xs text-[var(--color-fg-muted)] mt-0.5">
+              Akses dokumentasi {ORG_NAME} lebih cepat langsung dari layar utama.
+            </p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button
+            id="install-btn"
+            class="flex-1 py-2 rounded-xl bg-[var(--color-accent)] text-white text-xs font-semibold hover:opacity-90 active:scale-95 transition-all"
+            >Install</button
+          >
+          <button
+            id="install-dismiss"
+            class="flex-1 py-2 rounded-xl border border-[var(--color-border)] text-xs text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] active:scale-95 transition-all"
+            >Nanti</button
+          >
+        </div>
       </div>
     </div>
 
     <script is:inline>
-      document.getElementById("theme-toggle").addEventListener("click", () => {
-        const isDark = document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-      });
+      document
+        .getElementById("theme-toggle")
+        .addEventListener("click", function () {
+          var isDark = document.documentElement.classList.toggle("dark");
+          localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
 
-      let deferredPrompt;
-      const banner   = document.getElementById("install-banner");
-      const btnInst  = document.getElementById("install-btn");
-      const btnDism  = document.getElementById("install-dismiss");
+      var deferredPrompt = null;
+      var banner = document.getElementById("install-banner");
+      var btnInst = document.getElementById("install-btn");
+      var btnDism = document.getElementById("install-dismiss");
 
-      window.addEventListener("beforeinstallprompt", (e) => {
+      window.addEventListener("beforeinstallprompt", function (e) {
         e.preventDefault();
         deferredPrompt = e;
         if (!localStorage.getItem("pwa-dismissed")) {
-          banner.classList.remove("hidden");
-          requestAnimationFrame(() => banner.classList.add("show"));
+          setTimeout(function () {
+            banner.classList.add("show");
+          }, 2000);
         }
       });
 
-      btnInst && btnInst.addEventListener("click", async () => {
+      function hideBanner() {
         banner.classList.remove("show");
-        setTimeout(() => banner.classList.add("hidden"), 350);
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          await deferredPrompt.userChoice;
-          deferredPrompt = null;
-        }
-      });
+      }
 
-      btnDism && btnDism.addEventListener("click", () => {
-        banner.classList.remove("show");
-        setTimeout(() => banner.classList.add("hidden"), 350);
-        localStorage.setItem("pwa-dismissed", "1");
-      });
+      btnInst &&
+        btnInst.addEventListener("click", async function () {
+          hideBanner();
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+          }
+        });
+
+      btnDism &&
+        btnDism.addEventListener("click", function () {
+          hideBanner();
+          localStorage.setItem("pwa-dismissed", "1");
+        });
     </script>
   </body>
 </html>

@@ -1,10 +1,12 @@
 const BASE_URL = import.meta.env.IMMICH_BASE_URL;
 const API_KEY = import.meta.env.IMMICH_API_KEY;
 
-const headers = {
+const HEADERS = {
     "x-api-key": API_KEY,
     "Content-Type": "application/json",
 };
+
+const EXCLUDED_ALBUM_KEYWORDS = ["UNGGAH DOKUMENTASI"];
 
 export interface ImmichAlbum {
     id: string;
@@ -27,6 +29,8 @@ export interface ImmichAsset {
         description?: string;
         city?: string;
         country?: string;
+        make?: string;
+        model?: string;
     };
 }
 
@@ -34,22 +38,26 @@ export interface ImmichAlbumDetail extends ImmichAlbum {
     assets: ImmichAsset[];
 }
 
+export function isExcludedAlbum(album: ImmichAlbum): boolean {
+    return EXCLUDED_ALBUM_KEYWORDS.some((kw) =>
+        album.albumName.toUpperCase().includes(kw.toUpperCase())
+    );
+}
+
 export async function getAllAlbums(): Promise<ImmichAlbum[]> {
-    const res = await fetch(`${BASE_URL}/api/albums`, { headers });
+    const res = await fetch(`${BASE_URL}/api/albums?shared=true`, { headers: HEADERS });
     if (!res.ok) throw new Error(`Gagal fetch albums: ${res.statusText}`);
-    return res.json();
+    const all: ImmichAlbum[] = await res.json();
+    return all.filter((a) => a.shared && !isExcludedAlbum(a));
 }
 
 export async function getAlbumById(albumId: string): Promise<ImmichAlbumDetail> {
-    const res = await fetch(`${BASE_URL}/api/albums/${albumId}`, { headers });
+    const res = await fetch(`${BASE_URL}/api/albums/${albumId}`, { headers: HEADERS });
     if (!res.ok) throw new Error(`Gagal fetch album ${albumId}: ${res.statusText}`);
     return res.json();
 }
 
-export function getThumbnailUrl(
-    assetId: string,
-    size: "thumbnail" | "preview" = "thumbnail"
-): string {
+export function getThumbnailUrl(assetId: string, size: "thumbnail" | "preview" = "thumbnail"): string {
     return `/api/img?id=${assetId}&size=${size}`;
 }
 
@@ -58,7 +66,7 @@ export function getDownloadUrl(assetId: string): string {
 }
 
 export function getAlbumShareUrl(albumId: string): string {
-    return `${BASE_URL}/share/${albumId}`;
+    return `${BASE_URL}/s/${albumId}`;
 }
 
 export function getAlbumCoverUrl(album: ImmichAlbum): string | null {
@@ -66,24 +74,18 @@ export function getAlbumCoverUrl(album: ImmichAlbum): string | null {
     return getThumbnailUrl(album.albumThumbnailAssetId, "preview");
 }
 
-export async function getRecentAssets(limit = 24): Promise<ImmichAsset[]> {
+export async function getRecentAssets(limit = 30): Promise<ImmichAsset[]> {
     const albums = await getAllAlbums();
     const sorted = [...albums].sort(
         (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
-
-    const results = await Promise.all(
-        sorted.slice(0, 6).map((a) => getAlbumById(a.id))
-    );
-
+    const results = await Promise.all(sorted.map((a) => getAlbumById(a.id)));
     return results
         .flatMap((d) => d.assets.filter((a) => a.type === "IMAGE"))
         .slice(0, limit);
 }
 
-export function groupAlbumsByYear(
-    albums: ImmichAlbum[]
-): { year: string; albums: ImmichAlbum[] }[] {
+export function groupAlbumsByYear(albums: ImmichAlbum[]): { year: string; albums: ImmichAlbum[] }[] {
     const map = new Map<string, ImmichAlbum[]>();
     for (const album of albums) {
         const year = new Date(album.createdAt).getFullYear().toString();

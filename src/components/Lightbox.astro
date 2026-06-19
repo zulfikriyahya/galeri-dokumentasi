@@ -3,82 +3,173 @@ import type { ImmichAsset } from "../lib/immich";
 import { getThumbnailUrl, getDownloadUrl } from "../lib/immich";
 
 interface Props {
-    assets: ImmichAsset[];
+  assets: ImmichAsset[];
 }
 
 const { assets } = Astro.props;
 const images = assets.filter((a) => a.type === "IMAGE");
 ---
 
-<div class="columns-2 sm:columns-3 lg:columns-4 gap-2.5 space-y-2.5" id="photo-grid">
-  {images.map((asset, i) => (
-    <button
-      class="block w-full overflow-hidden rounded-xl break-inside-avoid cursor-zoom-in glossy-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-      data-index={i}
-      data-src={getThumbnailUrl(asset.id, "preview")}
-      data-download={getDownloadUrl(asset.id)}
-      data-name={asset.originalFileName}
-      data-date={new Date(asset.fileCreatedAt).toLocaleDateString("id-ID", { dateStyle: "long" })}
-      data-location={[asset.exifInfo?.city, asset.exifInfo?.country].filter(Boolean).join(", ")}
-      aria-label={`Buka foto ${asset.originalFileName}`}
+{
+  images.length === 0 ? (
+    <div class="flex flex-col items-center justify-center py-24 gap-4 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-[var(--color-canvas-subtle)] border border-[var(--color-border)] flex items-center justify-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          class="w-6 h-6 text-[var(--color-fg-subtle)]"
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="M21 15l-5-5L5 21" />
+        </svg>
+      </div>
+      <p class="text-sm text-[var(--color-fg-muted)] font-medium">
+        Belum ada foto di album ini
+      </p>
+    </div>
+  ) : (
+    <div
+      id="photo-grid"
+      class="columns-2 sm:columns-3 lg:columns-4 gap-2 sm:gap-2.5 space-y-2 sm:space-y-2.5"
     >
-      <img
-        src={getThumbnailUrl(asset.id, "thumbnail")}
-        alt={asset.originalFileName}
-        loading="lazy"
-        decoding="async"
-        class="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
-      />
-    </button>
-  ))}
-</div>
+      {images.map((asset, i) => (
+        <button
+          class="block w-full overflow-hidden rounded-xl break-inside-avoid cursor-zoom-in glossy-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 relative group"
+          data-index={i}
+          data-src={getThumbnailUrl(asset.id, "preview")}
+          data-download={getDownloadUrl(asset.id)}
+          data-name={asset.originalFileName}
+          data-date={new Date(asset.fileCreatedAt).toLocaleDateString("id-ID", {
+            dateStyle: "long",
+          })}
+          data-location={[asset.exifInfo?.city, asset.exifInfo?.country]
+            .filter(Boolean)
+            .join(", ")}
+          aria-label={`Buka foto ${asset.originalFileName}`}
+        >
+          <img
+            src={getThumbnailUrl(asset.id, "thumbnail")}
+            alt={asset.originalFileName}
+            loading="lazy"
+            decoding="async"
+            class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 ease-out block"
+          />
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 rounded-xl" />
+          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+                class="w-4 h-4"
+              >
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+              </svg>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  )
+}
 
 <div
   id="lightbox"
   class="fixed inset-0 z-50 hidden"
   role="dialog"
   aria-modal="true"
-  aria-label="Lightbox"
+  aria-label="Lightbox foto"
 >
-  <div class="absolute inset-0 bg-black/85 backdrop-blur-md" id="lb-backdrop"></div>
+  <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" id="lb-backdrop">
+  </div>
 
-  <button id="lb-close" class="absolute top-4 right-4 z-20 p-2 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Tutup">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+  <button
+    id="lb-close"
+    class="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all duration-200 backdrop-blur-sm border border-white/10"
+    aria-label="Tutup lightbox"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      class="w-5 h-5"
+    >
       <path d="M18 6 6 18M6 6l12 12"></path>
     </svg>
   </button>
 
-  <button id="lb-prev" class="absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Sebelumnya">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 sm:w-6 sm:h-6">
+  <button
+    id="lb-prev"
+    class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all duration-200 backdrop-blur-sm border border-white/10"
+    aria-label="Foto sebelumnya"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      class="w-5 h-5"
+    >
       <path d="M15 18l-6-6 6-6"></path>
     </svg>
   </button>
 
-  <div class="absolute inset-0 z-10 flex flex-col items-center justify-center px-14 sm:px-20 gap-4">
-    <div class="relative flex items-center justify-center w-full max-h-[78vh]">
+  <div
+    class="absolute inset-0 z-10 flex flex-col items-center justify-center px-14 sm:px-20 gap-3 sm:gap-4"
+  >
+    <div
+      class="relative flex items-center justify-center w-full"
+      style="max-height: calc(100vh - 8rem)"
+    >
       <img
         id="lb-img"
         src=""
         alt=""
-        class="max-h-[78vh] max-w-full object-contain rounded-xl shadow-2xl"
-        style="opacity:0;transition:opacity 0.2s ease"
+        class="max-h-[calc(100vh-8rem)] max-w-full object-contain rounded-xl"
+        style="opacity:0;transition:opacity 0.22s ease, transform 0.22s ease;transform:scale(0.97)"
       />
     </div>
 
-    <div class="glass rounded-xl px-4 py-3 w-full max-w-xl flex items-center justify-between gap-4">
+    <div
+      class="glass rounded-2xl px-4 sm:px-5 py-3 w-full max-w-lg flex items-center justify-between gap-3 sm:gap-4"
+    >
       <div class="min-w-0 flex-1">
-        <p id="lb-name" class="text-white text-sm font-medium truncate"></p>
-        <p id="lb-meta" class="text-white/50 text-xs mt-0.5 truncate"></p>
+        <p
+          id="lb-name"
+          class="text-white text-xs sm:text-sm font-medium truncate leading-snug"
+        >
+        </p>
+        <p id="lb-meta" class="text-white/45 text-[11px] mt-0.5 truncate"></p>
       </div>
-      <div class="flex items-center gap-2 shrink-0">
-        <p id="lb-counter" class="text-white/40 text-xs tabular-nums"></p>
+      <div class="flex items-center gap-2.5 shrink-0">
+        <p
+          id="lb-counter"
+          class="text-white/35 text-[11px] tabular-nums font-medium hidden sm:block"
+        >
+        </p>
         <a
           id="lb-download"
           href="#"
           download
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] sm:text-xs font-semibold transition-all duration-200 border border-white/10 hover:border-white/20"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            class="w-3 h-3"
+          >
             <path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"></path>
           </svg>
           Unduh
@@ -87,27 +178,40 @@ const images = assets.filter((a) => a.type === "IMAGE");
     </div>
   </div>
 
-  <button id="lb-next" class="absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Berikutnya">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 sm:w-6 sm:h-6">
+  <button
+    id="lb-next"
+    class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all duration-200 backdrop-blur-sm border border-white/10"
+    aria-label="Foto berikutnya"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      class="w-5 h-5"
+    >
       <path d="M9 18l6-6-6-6"></path>
     </svg>
   </button>
 </div>
 
 <script>
-  const lb       = document.getElementById("lightbox")!;
-  const lbImg    = document.getElementById("lb-img") as HTMLImageElement;
-  const lbName   = document.getElementById("lb-name")!;
-  const lbMeta   = document.getElementById("lb-meta")!;
-  const lbDl     = document.getElementById("lb-download") as HTMLAnchorElement;
-  const lbCtr    = document.getElementById("lb-counter")!;
+  const lb = document.getElementById("lightbox")!;
+  const lbImg = document.getElementById("lb-img") as HTMLImageElement;
+  const lbName = document.getElementById("lb-name")!;
+  const lbMeta = document.getElementById("lb-meta")!;
+  const lbDl = document.getElementById("lb-download") as HTMLAnchorElement;
+  const lbCtr = document.getElementById("lb-counter")!;
   const btnClose = document.getElementById("lb-close")!;
-  const btnPrev  = document.getElementById("lb-prev")!;
-  const btnNext  = document.getElementById("lb-next")!;
+  const btnPrev = document.getElementById("lb-prev")!;
+  const btnNext = document.getElementById("lb-next")!;
   const backdrop = document.getElementById("lb-backdrop")!;
 
-  const buttons  = Array.from(document.querySelectorAll<HTMLButtonElement>("#photo-grid button"));
-  let current    = 0;
+  const buttons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("#photo-grid button"),
+  );
+  let current = 0;
 
   function open(index: number) {
     current = index;
@@ -124,16 +228,25 @@ const images = assets.filter((a) => a.type === "IMAGE");
   function render() {
     const btn = buttons[current];
     lbImg.style.opacity = "0";
+    lbImg.style.transform = "scale(0.97)";
     lbImg.src = btn.dataset.src!;
     lbImg.alt = btn.dataset.name!;
-    lbImg.onload = () => { lbImg.style.opacity = "1"; };
+    lbImg.onload = () => {
+      lbImg.style.opacity = "1";
+      lbImg.style.transform = "scale(1)";
+    };
     lbName.textContent = btn.dataset.name!;
-    lbMeta.textContent = [btn.dataset.date, btn.dataset.location].filter(Boolean).join(" · ");
-    lbDl.href     = btn.dataset.download!;
+    const meta = [btn.dataset.date, btn.dataset.location]
+      .filter(Boolean)
+      .join("  ·  ");
+    lbMeta.textContent = meta;
+    lbDl.href = btn.dataset.download!;
     lbDl.download = btn.dataset.name!;
     lbCtr.textContent = `${current + 1} / ${buttons.length}`;
+
     btnPrev.style.visibility = current === 0 ? "hidden" : "visible";
-    btnNext.style.visibility = current === buttons.length - 1 ? "hidden" : "visible";
+    btnNext.style.visibility =
+      current === buttons.length - 1 ? "hidden" : "visible";
 
     if (current + 1 < buttons.length) {
       const pre = new Image();
@@ -142,24 +255,57 @@ const images = assets.filter((a) => a.type === "IMAGE");
   }
 
   buttons.forEach((btn, i) => btn.addEventListener("click", () => open(i)));
-  btnPrev.addEventListener("click", () => { if (current > 0) { current--; render(); } });
-  btnNext.addEventListener("click", () => { if (current < buttons.length - 1) { current++; render(); } });
   btnClose.addEventListener("click", close);
   backdrop.addEventListener("click", close);
 
+  btnPrev.addEventListener("click", () => {
+    if (current > 0) {
+      current--;
+      render();
+    }
+  });
+  btnNext.addEventListener("click", () => {
+    if (current < buttons.length - 1) {
+      current++;
+      render();
+    }
+  });
+
   let startX = 0;
-  lb.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; }, { passive: true });
+  let startY = 0;
+  lb.addEventListener(
+    "touchstart",
+    (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    },
+    { passive: true },
+  );
   lb.addEventListener("touchend", (e) => {
     const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dy) > Math.abs(dx)) return;
     if (Math.abs(dx) < 40) return;
-    if (dx < 0 && current < buttons.length - 1) { current++; render(); }
-    if (dx > 0 && current > 0)                  { current--; render(); }
+    if (dx < 0 && current < buttons.length - 1) {
+      current++;
+      render();
+    }
+    if (dx > 0 && current > 0) {
+      current--;
+      render();
+    }
   });
 
   document.addEventListener("keydown", (e) => {
     if (lb.classList.contains("hidden")) return;
-    if (e.key === "Escape")     close();
-    if (e.key === "ArrowLeft"  && current > 0)                  { current--; render(); }
-    if (e.key === "ArrowRight" && current < buttons.length - 1) { current++; render(); }
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft" && current > 0) {
+      current--;
+      render();
+    }
+    if (e.key === "ArrowRight" && current < buttons.length - 1) {
+      current++;
+      render();
+    }
   });
 </script>

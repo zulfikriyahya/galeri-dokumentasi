@@ -1,7 +1,7 @@
-const CACHE_STATIC = "rohis-static-v1";
-const CACHE_IMAGES = "rohis-images-v1";
+const CACHE_STATIC = "static-v1";
+const CACHE_IMAGES = "images-v1";
 
-const STATIC_ASSETS = ["/", "/album", "/manifest.webmanifest", "/favicon.svg"];
+const STATIC_ASSETS = ["/", "/albums", "/favicon.svg"];
 
 self.addEventListener("install", (e) => {
     e.waitUntil(

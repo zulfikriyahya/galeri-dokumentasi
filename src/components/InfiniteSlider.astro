@@ -3,7 +3,7 @@ import type { ImmichAsset } from "../lib/immich";
 import { getThumbnailUrl } from "../lib/immich";
 
 interface Props {
-    assets: ImmichAsset[];
+  assets: ImmichAsset[];
 }
 
 const { assets } = Astro.props;
@@ -12,31 +12,35 @@ const rowOne = assets.slice(0, half);
 const rowTwo = assets.slice(half);
 ---
 
-<div class="space-y-3 py-4 overflow-hidden">
+<div class="space-y-2.5 py-4 overflow-hidden select-none">
   <div class="zigzag-row">
     <div class="zigzag-track zigzag-left">
-      {[...rowOne, ...rowOne].map((asset) => (
-        <img
-          src={getThumbnailUrl(asset.id, "preview")}
-          alt={asset.originalFileName}
-          loading="lazy"
-          decoding="async"
-          class="h-28 sm:h-36 w-auto rounded-xl object-cover glossy-card flex-shrink-0"
-        />
-      ))}
+      {
+        [...rowOne, ...rowOne].map((asset) => (
+          <img
+            src={getThumbnailUrl(asset.id, "preview")}
+            alt={asset.originalFileName}
+            loading="lazy"
+            decoding="async"
+            class="h-28 sm:h-36 w-auto rounded-xl object-cover glossy-card flex-shrink-0 pointer-events-none"
+          />
+        ))
+      }
     </div>
   </div>
   <div class="zigzag-row">
     <div class="zigzag-track zigzag-right">
-      {[...rowTwo, ...rowTwo].map((asset) => (
-        <img
-          src={getThumbnailUrl(asset.id, "preview")}
-          alt={asset.originalFileName}
-          loading="lazy"
-          decoding="async"
-          class="h-28 sm:h-36 w-auto rounded-xl object-cover glossy-card flex-shrink-0"
-        />
-      ))}
+      {
+        [...rowTwo, ...rowTwo].map((asset) => (
+          <img
+            src={getThumbnailUrl(asset.id, "preview")}
+            alt={asset.originalFileName}
+            loading="lazy"
+            decoding="async"
+            class="h-28 sm:h-36 w-auto rounded-xl object-cover glossy-card flex-shrink-0 pointer-events-none"
+          />
+        ))
+      }
     </div>
   </div>
 </div>
