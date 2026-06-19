@@ -71,10 +71,10 @@ const year = new Date().getFullYear();
     <slot name="sidebar" />
 
     <div id="app-content" class="flex flex-col min-h-screen">
-      <header
+      <!-- <header
         class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-5 h-14 border-b border-[var(--glass-border)] shrink-0"
       >
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
           <button
             id="sidebar-toggle"
             type="button"
@@ -87,13 +87,55 @@ const year = new Date().getFullYear();
               fill="none"
               stroke="currentColor"
               stroke-width="2"
-              class="w-4 h-4"
+              class="w-4 h-4 sidebar-icon-open"
             >
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
+              <rect x="3" y="3" width="7" height="18" rx="1.5" opacity="0.3"
+              ></rect>
+              <line x1="14" y1="7" x2="21" y2="7"></line>
+              <line x1="14" y1="12" x2="21" y2="12"></line>
+              <line x1="14" y1="17" x2="21" y2="17"></line>
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4 sidebar-icon-closed hidden"
+            >
+              <rect x="14" y="3" width="7" height="18" rx="1.5" opacity="0.3"
+              ></rect>
+              <line x1="3" y1="7" x2="10" y2="7"></line>
+              <line x1="3" y1="12" x2="10" y2="12"></line>
+              <line x1="3" y1="17" x2="10" y2="17"></line>
             </svg>
           </button>
+
+          <a
+            href="/"
+            class="lg:hidden flex items-center gap-2.5 font-semibold tracking-tight text-[var(--color-fg)] text-sm"
+          >
+            <span
+              class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+                class="w-3.5 h-3.5"
+              >
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            </span>
+            <span class="leading-tight truncate max-w-[160px] sm:max-w-xs"
+              >{SITE_SHORT_NAME}</span
+            >
+          </a>
         </div>
 
         <button
@@ -126,6 +168,128 @@ const year = new Date().getFullYear();
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
         </button>
+      </header> -->
+      <header
+        class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-5 h-14 border-b border-[var(--glass-border)] shrink-0"
+      >
+        <div class="flex items-center gap-3">
+          <button
+            id="sidebar-toggle"
+            type="button"
+            aria-label="Toggle sidebar"
+            class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200 shrink-0"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4 sidebar-icon-open"
+            >
+              <rect x="3" y="3" width="7" height="18" rx="1.5" opacity="0.3"
+              ></rect>
+              <line x1="14" y1="7" x2="21" y2="7"></line>
+              <line x1="14" y1="12" x2="21" y2="12"></line>
+              <line x1="14" y1="17" x2="21" y2="17"></line>
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4 sidebar-icon-closed hidden"
+            >
+              <rect x="14" y="3" width="7" height="18" rx="1.5" opacity="0.3"
+              ></rect>
+              <line x1="3" y1="7" x2="10" y2="7"></line>
+              <line x1="3" y1="12" x2="10" y2="12"></line>
+              <line x1="3" y1="17" x2="10" y2="17"></line>
+            </svg>
+          </button>
+          <a
+            href="/"
+            class="lg:hidden flex items-center gap-2.5 font-semibold
+          tracking-tight text-[var(--color-fg)] text-sm"
+          >
+            <span
+              class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+                class="w-3.5 h-3.5"
+              >
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            </span>
+            <span class="leading-tight truncate max-w-[160px] sm:max-w-xs"
+              >{SITE_SHORT_NAME}</span
+            >
+          </a>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a
+            href="https://github.com/zulfikriyahya"
+            target="_blank"
+            rel="noopener
+        noreferrer"
+            aria-label="GitHub"
+            class="w-8 h-8 flex items-center
+        justify-center rounded-lg border border-[var(--color-border-muted)]
+        hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)]
+        transition-all duration-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+              ></path>
+            </svg>
+          </a>
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Ganti tema"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4 hidden dark:block"
+            >
+              <circle cx="12" cy="12" r="4"></circle>
+              <path
+                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+              ></path>
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4 block dark:hidden"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </div>
       </header>
 
       <main class="flex-1 pb-20 lg:pb-0">
@@ -158,10 +322,7 @@ const year = new Date().getFullYear();
       class="mobile-nav fixed bottom-0 left-0 right-0 z-40 lg:hidden glass border-t border-[var(--glass-border)]"
       aria-label="Navigasi utama"
     >
-      <div
-        class="flex items-stretch h-16"
-        style="max-width:360px;margin:0 auto"
-      >
+      <div class="flex items-stretch h-16 max-w-sm mx-auto">
         <a
           href="/"
           aria-label="Beranda"
@@ -268,7 +429,28 @@ const year = new Date().getFullYear();
         sbToggle.addEventListener("click", function () {
           var c = document.body.classList.toggle("sb-collapsed");
           localStorage.setItem("sb-collapsed", c ? "1" : "0");
+          var iconOpen = sbToggle.querySelector(".sidebar-icon-open");
+          var iconClosed = sbToggle.querySelector(".sidebar-icon-closed");
+          if (c) {
+            iconOpen && iconOpen.classList.add("hidden");
+            iconClosed && iconClosed.classList.remove("hidden");
+          } else {
+            iconOpen && iconOpen.classList.remove("hidden");
+            iconClosed && iconClosed.classList.add("hidden");
+          }
         });
+
+      (function () {
+        var c = document.body.classList.contains("sb-collapsed");
+        var sbToggle = document.getElementById("sidebar-toggle");
+        if (!sbToggle) return;
+        var iconOpen = sbToggle.querySelector(".sidebar-icon-open");
+        var iconClosed = sbToggle.querySelector(".sidebar-icon-closed");
+        if (c) {
+          iconOpen && iconOpen.classList.add("hidden");
+          iconClosed && iconClosed.classList.remove("hidden");
+        }
+      })();
 
       var deferredPrompt = null;
       var banner = document.getElementById("install-banner");

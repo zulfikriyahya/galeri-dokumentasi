@@ -6,7 +6,10 @@ const HEADERS = {
     "Content-Type": "application/json",
 };
 
-const EXCLUDED_ALBUM_KEYWORDS = ["UNGGAH DOKUMENTASI"];
+function getExcludedKeywords(): string[] {
+    const raw = import.meta.env.EXCLUDED_ALBUM_KEYWORDS ?? "UNGGAH DOKUMENTASI";
+    return raw.split(",").map((k: string) => k.trim()).filter(Boolean);
+}
 
 export interface ImmichAlbum {
     id: string;
@@ -39,7 +42,8 @@ export interface ImmichAlbumDetail extends ImmichAlbum {
 }
 
 export function isExcludedAlbum(album: ImmichAlbum): boolean {
-    return EXCLUDED_ALBUM_KEYWORDS.some((kw) =>
+    const keywords = getExcludedKeywords();
+    return keywords.some((kw) =>
         album.albumName.toUpperCase().includes(kw.toUpperCase())
     );
 }

@@ -30,7 +30,7 @@ async function createIcons() {
     await sharp(svg512).png().toFile("public/icons/icon-512.png");
     await sharp(svg512).png().toFile("public/og.png");
 
-    console.log("🚀 Icons successfully generated via sharp!");
+    console.log("Icons successfully generated via sharp!");
 }
 
 createIcons().catch(console.error);

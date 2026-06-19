@@ -8,6 +8,7 @@ interface ImportMetaEnv {
     readonly SCHOOL_NAME: string;
     readonly POWERED_BY: string;
     readonly POWERED_BY_URL: string;
+    readonly EXCLUDED_ALBUM_KEYWORDS: string;
 }
 
 interface ImportMeta {

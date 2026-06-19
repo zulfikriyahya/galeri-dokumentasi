@@ -25,31 +25,9 @@ const isAlbumPage = currentPath.startsWith("/albums/");
   <div
     class="flex items-center h-14 px-3 border-b border-[var(--glass-border)] shrink-0 gap-2 overflow-hidden"
   >
-    <!-- <span
-      class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="white"
-        stroke-width="2"
-        class="w-3.5 h-3.5"
-      >
-        <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-        <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-        <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-        <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-      </svg>
-    </span>
-    <span
-      class="sb-label text-xs font-semibold text-[var(--color-fg-subtle)] uppercase tracking-widest truncate whitespace-nowrap"
-    >
-      Navigasi
-    </span> -->
     <a
       href="/"
-      class="flex items-center gap-2 font-semibold tracking-tight text-[var(--color-fg)] text-sm"
+      class="flex items-center gap-2 font-semibold tracking-tight text-[var(--color-fg)] text-sm min-w-0"
     >
       <span
         class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
@@ -68,8 +46,7 @@ const isAlbumPage = currentPath.startsWith("/albums/");
           <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
         </svg>
       </span>
-      <span class="hidden sm:block leading-tight">{SITE_NAME}</span>
-      <span class="sm:hidden leading-tight">{SITE_SHORT_NAME}</span>
+      <span class="sb-label leading-tight truncate">{SITE_NAME}</span>
     </a>
   </div>
 
