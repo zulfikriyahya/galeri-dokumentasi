@@ -14,38 +14,39 @@ function spanFor(index: number): string {
   if (pattern === 3) return "sm:col-span-2";
   return "";
 }
+
+const items = albums.map((album, index) => ({
+  album,
+  href: "/gallery/" + album.id,
+  cover: getAlbumCoverUrl(album),
+  span: spanFor(index),
+}));
 ---
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 auto-rows-[180px]">
-  {albums.map((album, index) => {
-    const cover = getAlbumCoverUrl(album);
-    return (
-      
-        href={`/gallery/${album.id}`}
-        class:list={["group relative overflow-hidden rounded-2xl glossy-card", spanFor(index)]}
-      >
-        {cover ? (
-          <img
-            src={cover}
-            alt={album.albumName}
-            loading="lazy"
-            class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div class="absolute inset-0 flex items-center justify-center bg-[var(--color-canvas-subtle)]">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-10 h-10 text-[var(--color-fg-muted)]">
-              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <path d="M21 15l-5-5L5 21"></path>
-            </svg>
-          </div>
-        )}
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
-          <h3 class="font-semibold leading-tight truncate">{album.albumName}</h3>
-          <span class="text-xs text-white/70 mt-1 block">{album.assetCount} foto</span>
+  {items.map((item) => (
+    <a href={item.href} class:list={["group relative overflow-hidden rounded-2xl glossy-card", item.span]}>
+      {item.cover ? (
+        <img
+          src={item.cover}
+          alt={item.album.albumName}
+          loading="lazy"
+          class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      ) : (
+        <div class="absolute inset-0 flex items-center justify-center bg-[var(--color-canvas-subtle)]">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-10 h-10 text-[var(--color-fg-muted)]">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <path d="M21 15l-5-5L5 21"></path>
+          </svg>
         </div>
-      </a>
-    );
-  })}
+      )}
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+      <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+        <h3 class="font-semibold leading-tight truncate">{item.album.albumName}</h3>
+        <span class="text-xs text-white/70 mt-1 block">{item.album.assetCount} foto</span>
+      </div>
+    </a>
+  ))}
 </div>
