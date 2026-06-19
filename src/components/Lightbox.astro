@@ -3,17 +3,17 @@ import type { ImmichAsset } from "../lib/immich";
 import { getThumbnailUrl, getDownloadUrl } from "../lib/immich";
 
 interface Props {
-  assets: ImmichAsset[];
+    assets: ImmichAsset[];
 }
 
 const { assets } = Astro.props;
 const images = assets.filter((a) => a.type === "IMAGE");
 ---
 
-<div class="columns-2 sm:columns-3 lg:columns-4 gap-3 space-y-3" id="photo-grid">
+<div class="columns-2 sm:columns-3 lg:columns-4 gap-2.5 space-y-2.5" id="photo-grid">
   {images.map((asset, i) => (
     <button
-      class="block w-full overflow-hidden rounded-xl break-inside-avoid cursor-zoom-in glossy-card focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      class="block w-full overflow-hidden rounded-xl break-inside-avoid cursor-zoom-in glossy-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
       data-index={i}
       data-src={getThumbnailUrl(asset.id, "preview")}
       data-download={getDownloadUrl(asset.id)}
@@ -26,6 +26,7 @@ const images = assets.filter((a) => a.type === "IMAGE");
         src={getThumbnailUrl(asset.id, "thumbnail")}
         alt={asset.originalFileName}
         loading="lazy"
+        decoding="async"
         class="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
       />
     </button>
@@ -34,54 +35,60 @@ const images = assets.filter((a) => a.type === "IMAGE");
 
 <div
   id="lightbox"
-  class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden items-center justify-center"
+  class="fixed inset-0 z-50 hidden"
   role="dialog"
   aria-modal="true"
   aria-label="Lightbox"
 >
-  <button id="lb-close" class="absolute top-4 right-4 text-white/70 hover:text-white z-10 transition-colors" aria-label="Tutup">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-7 h-7">
+  <div class="absolute inset-0 bg-black/85 backdrop-blur-md" id="lb-backdrop"></div>
+
+  <button id="lb-close" class="absolute top-4 right-4 z-20 p-2 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Tutup">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5">
       <path d="M18 6 6 18M6 6l12 12"></path>
     </svg>
   </button>
 
-  <button id="lb-prev" class="absolute left-3 sm:left-6 text-white/70 hover:text-white z-10 transition-colors" aria-label="Foto sebelumnya">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-9 h-9">
+  <button id="lb-prev" class="absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Sebelumnya">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 sm:w-6 sm:h-6">
       <path d="M15 18l-6-6 6-6"></path>
     </svg>
   </button>
 
-  <div class="flex flex-col items-center max-w-5xl w-full px-16">
-    <img
-      id="lb-img"
-      src=""
-      alt=""
-      class="max-h-[80vh] max-w-full object-contain rounded-lg shadow-2xl transition-opacity duration-200"
-    />
-
-    <div class="flex items-center justify-between w-full mt-4 px-2 gap-4">
-      <div class="text-left">
-        <p id="lb-name" class="text-white text-sm font-medium truncate max-w-xs"></p>
-        <p id="lb-meta" class="text-white/50 text-xs mt-0.5"></p>
-      </div>
-      
-        id="lb-download"
-        href="#"
-        download
-        class="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition-colors"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
-          <path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"></path>
-        </svg>
-        Download
-      </a>
+  <div class="absolute inset-0 z-10 flex flex-col items-center justify-center px-14 sm:px-20 gap-4">
+    <div class="relative flex items-center justify-center w-full max-h-[78vh]">
+      <img
+        id="lb-img"
+        src=""
+        alt=""
+        class="max-h-[78vh] max-w-full object-contain rounded-xl shadow-2xl"
+        style="opacity:0;transition:opacity 0.2s ease"
+      />
     </div>
 
-    <p id="lb-counter" class="text-white/30 text-xs mt-3"></p>
+    <div class="glass rounded-xl px-4 py-3 w-full max-w-xl flex items-center justify-between gap-4">
+      <div class="min-w-0 flex-1">
+        <p id="lb-name" class="text-white text-sm font-medium truncate"></p>
+        <p id="lb-meta" class="text-white/50 text-xs mt-0.5 truncate"></p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <p id="lb-counter" class="text-white/40 text-xs tabular-nums"></p>
+        <a
+          id="lb-download"
+          href="#"
+          download
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5">
+            <path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"></path>
+          </svg>
+          Unduh
+        </a>
+      </div>
+    </div>
   </div>
 
-  <button id="lb-next" class="absolute right-3 sm:right-6 text-white/70 hover:text-white z-10 transition-colors" aria-label="Foto berikutnya">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-9 h-9">
+  <button id="lb-next" class="absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full glass text-white/80 hover:text-white transition-colors" aria-label="Berikutnya">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 sm:w-6 sm:h-6">
       <path d="M9 18l6-6-6-6"></path>
     </svg>
   </button>
@@ -97,59 +104,62 @@ const images = assets.filter((a) => a.type === "IMAGE");
   const btnClose = document.getElementById("lb-close")!;
   const btnPrev  = document.getElementById("lb-prev")!;
   const btnNext  = document.getElementById("lb-next")!;
+  const backdrop = document.getElementById("lb-backdrop")!;
 
   const buttons  = Array.from(document.querySelectorAll<HTMLButtonElement>("#photo-grid button"));
   let current    = 0;
 
   function open(index: number) {
     current = index;
-    render();
     lb.classList.remove("hidden");
-    lb.classList.add("flex");
     document.body.style.overflow = "hidden";
+    render();
   }
 
   function close() {
     lb.classList.add("hidden");
-    lb.classList.remove("flex");
     document.body.style.overflow = "";
   }
 
   function render() {
     const btn = buttons[current];
-    const src      = btn.dataset.src!;
-    const name     = btn.dataset.name!;
-    const date     = btn.dataset.date!;
-    const location = btn.dataset.location || "";
-    const download = btn.dataset.download!;
-
     lbImg.style.opacity = "0";
-    lbImg.src = src;
-    lbImg.alt = name;
+    lbImg.src = btn.dataset.src!;
+    lbImg.alt = btn.dataset.name!;
     lbImg.onload = () => { lbImg.style.opacity = "1"; };
-
-    lbName.textContent = name;
-    lbMeta.textContent = [date, location].filter(Boolean).join(" · ");
-    lbDl.href = download;
-    lbDl.download = name;
+    lbName.textContent = btn.dataset.name!;
+    lbMeta.textContent = [btn.dataset.date, btn.dataset.location].filter(Boolean).join(" · ");
+    lbDl.href     = btn.dataset.download!;
+    lbDl.download = btn.dataset.name!;
     lbCtr.textContent = `${current + 1} / ${buttons.length}`;
-
     btnPrev.style.visibility = current === 0 ? "hidden" : "visible";
     btnNext.style.visibility = current === buttons.length - 1 ? "hidden" : "visible";
+
+    if (current + 1 < buttons.length) {
+      const pre = new Image();
+      pre.src = buttons[current + 1].dataset.src!;
+    }
   }
 
   buttons.forEach((btn, i) => btn.addEventListener("click", () => open(i)));
-
   btnPrev.addEventListener("click", () => { if (current > 0) { current--; render(); } });
   btnNext.addEventListener("click", () => { if (current < buttons.length - 1) { current++; render(); } });
-
   btnClose.addEventListener("click", close);
-  lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
+  backdrop.addEventListener("click", close);
+
+  let startX = 0;
+  lb.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) < 40) return;
+    if (dx < 0 && current < buttons.length - 1) { current++; render(); }
+    if (dx > 0 && current > 0)                  { current--; render(); }
+  });
 
   document.addEventListener("keydown", (e) => {
     if (lb.classList.contains("hidden")) return;
-    if (e.key === "Escape")      close();
-    if (e.key === "ArrowLeft"  && current > 0)               { current--; render(); }
+    if (e.key === "Escape")     close();
+    if (e.key === "ArrowLeft"  && current > 0)                  { current--; render(); }
     if (e.key === "ArrowRight" && current < buttons.length - 1) { current++; render(); }
   });
 </script>

@@ -2,32 +2,45 @@
 import "../styles/global.css";
 
 interface Props {
-  title?: string;
+    title?: string;
+    description?: string;
 }
 
-const { title = "ROHIS Gallery" } = Astro.props;
+const { title = "ROHIS Gallery", description = "Dokumentasi kegiatan ROHIS dalam satu tempat." } = Astro.props;
+const ogImage = "/og.png";
 ---
 
 <html lang="id">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0969da" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ROHIS Gallery" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>
     <script is:inline>
-      const stored = window.localStorage.getItem("theme");
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const theme = stored ?? (prefersDark ? "dark" : "light");
-      document.documentElement.classList.toggle("dark", theme === "dark");
+      const stored = localStorage.getItem("theme");
+      const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.classList.toggle("dark", (stored ?? (prefersDark ? "dark" : "light")) === "dark");
     </script>
   </head>
   <body class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen">
+
     <div class="lg:flex">
       <slot name="sidebar" />
-      <div class="flex-1 min-w-0">
-        <header class="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--color-border)] bg-[var(--color-canvas)]/90 backdrop-blur">
-          <a href="/" class="font-semibold">ROHIS Gallery</a>
+      <div class="flex-1 min-w-0 flex flex-col">
+        <header class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--glass-border)]">
+          <a href="/" class="font-semibold tracking-tight text-[var(--color-fg)]">ROHIS Gallery</a>
           <button
             id="theme-toggle"
             type="button"
@@ -43,15 +56,60 @@ const { title = "ROHIS Gallery" } = Astro.props;
             </svg>
           </button>
         </header>
-        <main>
+        <main class="flex-1">
           <slot />
         </main>
+        <footer class="px-6 py-4 text-center text-xs text-[var(--color-fg-muted)] border-t border-[var(--color-border)]">
+          ROHIS Gallery &copy; {new Date().getFullYear()}
+        </footer>
       </div>
     </div>
+
+    <div
+      id="install-banner"
+      class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm glass rounded-2xl px-5 py-4 shadow-xl border border-[var(--glass-border)] hidden"
+    >
+      <p class="text-sm font-medium text-[var(--color-fg)] mb-3">Install ROHIS Gallery ke layar utama?</p>
+      <div class="flex gap-2">
+        <button id="install-btn" class="flex-1 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity">Install</button>
+        <button id="install-dismiss" class="flex-1 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-fg-muted)] hover:bg-[var(--color-canvas-subtle)] transition-colors">Nanti</button>
+      </div>
+    </div>
+
     <script is:inline>
       document.getElementById("theme-toggle").addEventListener("click", () => {
         const isDark = document.documentElement.classList.toggle("dark");
-        window.localStorage.setItem("theme", isDark ? "dark" : "light");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+      });
+
+      let deferredPrompt;
+      const banner   = document.getElementById("install-banner");
+      const btnInst  = document.getElementById("install-btn");
+      const btnDism  = document.getElementById("install-dismiss");
+
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (!localStorage.getItem("pwa-dismissed")) {
+          banner.classList.remove("hidden");
+          requestAnimationFrame(() => banner.classList.add("show"));
+        }
+      });
+
+      btnInst && btnInst.addEventListener("click", async () => {
+        banner.classList.remove("show");
+        setTimeout(() => banner.classList.add("hidden"), 350);
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          await deferredPrompt.userChoice;
+          deferredPrompt = null;
+        }
+      });
+
+      btnDism && btnDism.addEventListener("click", () => {
+        banner.classList.remove("show");
+        setTimeout(() => banner.classList.add("hidden"), 350);
+        localStorage.setItem("pwa-dismissed", "1");
       });
     </script>
   </body>

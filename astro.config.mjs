@@ -3,7 +3,7 @@ import node from "@astrojs/node";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-    output: "server",
+    output: "static",
     adapter: node({ mode: "standalone" }),
     vite: {
         plugins: [tailwindcss()],

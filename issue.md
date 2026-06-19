@@ -1,7 +1,9 @@
 ## Permission dari API
 - album.read
-- album.download
-- album.share
+- asset.read
+- asset.view
+- asset.download
+- sharedLink.read (Belum Implementasi)
 
 ---
 
@@ -13,4 +15,13 @@
 - Bento Grid
 - Infinite Slider Zigzag
 - Sidebar: Kelompokkan Peralbum
-- Gambar ketika diklik muncul box 
+- Gambar ketika diklik muncul Lightbox (Diperindah, cepat dan responsive)
+- Responsive (Smartphone First) (Belum Implementasi)
+- Font Family : Lexend (Belum Implementasi)
+- Jadikan Tampilannya Lebih Proporsional, simetris dan Elegan (Belum Implementasi)
+- Jadikan PWA dan dapat diinstall (Popup Permintaan Install) (Belum Implementasi)
+- Caching data Agar Cepat ketika load gambar (Belum Implementasi)
+- Glassmorphism (Belum Implementasi)
+
+finalkan project ini!
+

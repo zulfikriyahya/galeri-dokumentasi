@@ -5,22 +5,30 @@ import InfiniteSlider from "../components/InfiniteSlider.astro";
 import AlbumGrid from "../components/AlbumGrid.astro";
 import { getAllAlbums, getRecentAssets } from "../lib/immich";
 
-const albums = await getAllAlbums();
-const recentAssets = await getRecentAssets(24);
+const [albums, recentAssets] = await Promise.all([
+    getAllAlbums(),
+    getRecentAssets(24),
+]);
 ---
 
 <Layout title="ROHIS Gallery">
   <Sidebar slot="sidebar" albums={albums} />
 
-  <section class="px-4 sm:px-6 py-10">
-    <h1 class="text-3xl sm:text-4xl font-bold mb-2">Galeri ROHIS</h1>
-    <p class="text-[var(--color-fg-muted)]">Dokumentasi kegiatan dalam satu tempat.</p>
+  <section class="px-4 sm:px-8 pt-10 pb-4">
+    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight mb-1">Galeri ROHIS</h1>
+    <p class="text-sm text-[var(--color-fg-muted)]">Dokumentasi kegiatan dalam satu tempat.</p>
   </section>
 
   {recentAssets.length > 0 && <InfiniteSlider assets={recentAssets} />}
 
-  <section class="px-4 sm:px-6 py-10">
-    <h2 class="text-xl font-semibold mb-6">Semua Album</h2>
+  <section class="px-4 sm:px-8 py-8">
+    <h2 class="text-base font-semibold mb-4 text-[var(--color-fg-muted)] uppercase tracking-widest text-xs">Semua Album</h2>
     <AlbumGrid albums={albums} />
   </section>
 </Layout>
+
+<script is:inline>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js");
+  }
+</script>

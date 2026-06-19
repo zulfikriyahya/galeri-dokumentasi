@@ -50,11 +50,11 @@ export function getThumbnailUrl(
     assetId: string,
     size: "thumbnail" | "preview" = "thumbnail"
 ): string {
-    return `${BASE_URL}/api/assets/${assetId}/thumbnail?size=${size}&key=${API_KEY}`;
+    return `/api/img?id=${assetId}&size=${size}`;
 }
 
 export function getDownloadUrl(assetId: string): string {
-    return `${BASE_URL}/api/assets/${assetId}/original?key=${API_KEY}`;
+    return `/api/img?id=${assetId}&type=original`;
 }
 
 export function getAlbumShareUrl(albumId: string): string {
@@ -71,13 +71,14 @@ export async function getRecentAssets(limit = 24): Promise<ImmichAsset[]> {
     const sorted = [...albums].sort(
         (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
-    const assets: ImmichAsset[] = [];
-    for (const album of sorted) {
-        if (assets.length >= limit) break;
-        const detail = await getAlbumById(album.id);
-        assets.push(...detail.assets.filter((a) => a.type === "IMAGE"));
-    }
-    return assets.slice(0, limit);
+
+    const results = await Promise.all(
+        sorted.slice(0, 6).map((a) => getAlbumById(a.id))
+    );
+
+    return results
+        .flatMap((d) => d.assets.filter((a) => a.type === "IMAGE"))
+        .slice(0, limit);
 }
 
 export function groupAlbumsByYear(

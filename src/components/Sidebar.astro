@@ -3,31 +3,35 @@ import type { ImmichAlbum } from "../lib/immich";
 import { groupAlbumsByYear } from "../lib/immich";
 
 interface Props {
-  albums: ImmichAlbum[];
-  activeId?: string;
+    albums: ImmichAlbum[];
+    activeId?: string;
 }
 
 const { albums, activeId } = Astro.props;
 const groups = groupAlbumsByYear(albums);
 ---
 
-<aside class="lg:w-64 lg:shrink-0 lg:border-r lg:border-[var(--color-border)] lg:bg-[var(--color-canvas-subtle)] lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto">
+<aside class="lg:w-64 lg:shrink-0 lg:border-r lg:border-[var(--color-border)] lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto lg:flex lg:flex-col glass">
+  <div class="hidden lg:flex items-center px-5 py-5 border-b border-[var(--glass-border)] shrink-0">
+    <a href="/" class="font-semibold tracking-tight text-[var(--color-fg)] text-base">ROHIS Gallery</a>
+  </div>
+
   <details class="lg:hidden border-b border-[var(--color-border)]">
-    <summary class="px-4 py-3 cursor-pointer font-medium select-none">Album</summary>
-    <nav class="px-3 pb-4 space-y-5">
+    <summary class="px-4 py-3 cursor-pointer font-medium select-none text-sm">Album</summary>
+    <nav class="px-3 pb-4 space-y-4">
       {groups.map((group) => (
         <div>
-          <p class="px-2 text-xs font-semibold uppercase tracking-wide text-[var(--color-fg-muted)] mb-2">
-            {group.year}
-          </p>
-          <ul class="space-y-1">
+          <p class="px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-fg-muted)] mb-1.5">{group.year}</p>
+          <ul class="space-y-0.5">
             {group.albums.map((album) => (
               <li>
-                
+                <a
                   href={`/gallery/${album.id}`}
                   class:list={[
-                    "block px-2 py-1.5 rounded-md text-sm truncate",
-                    activeId === album.id ? "bg-[var(--color-accent)] text-white" : "hover:bg-[var(--color-canvas)]",
+                    "block px-2 py-1.5 rounded-lg text-sm truncate transition-colors",
+                    activeId === album.id
+                      ? "bg-[var(--color-accent)] text-white font-medium"
+                      : "text-[var(--color-fg)] hover:bg-[var(--color-canvas-subtle)]",
                   ]}
                 >
                   {album.albumName}
@@ -40,33 +44,28 @@ const groups = groupAlbumsByYear(albums);
     </nav>
   </details>
 
-  <div class="hidden lg:flex lg:flex-col lg:h-full">
-    <div class="px-5 py-6 border-b border-[var(--color-border)]">
-      <a href="/" class="text-lg font-semibold">ROHIS Gallery</a>
-    </div>
-    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
-      {groups.map((group) => (
-        <div>
-          <p class="px-2 text-xs font-semibold uppercase tracking-wide text-[var(--color-fg-muted)] mb-2">
-            {group.year}
-          </p>
-          <ul class="space-y-1">
-            {group.albums.map((album) => (
-              <li>
-                
-                  href={`/gallery/${album.id}`}
-                  class:list={[
-                    "block px-2 py-1.5 rounded-md text-sm truncate transition-colors",
-                    activeId === album.id ? "bg-[var(--color-accent)] text-white" : "text-[var(--color-fg)] hover:bg-[var(--color-canvas)]",
-                  ]}
-                >
-                  {album.albumName}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </nav>
-  </div>
+  <nav class="hidden lg:block flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+    {groups.map((group) => (
+      <div>
+        <p class="px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-fg-muted)] mb-1.5">{group.year}</p>
+        <ul class="space-y-0.5">
+          {group.albums.map((album) => (
+            <li>
+              <a
+                href={`/gallery/${album.id}`}
+                class:list={[
+                  "block px-2 py-1.5 rounded-lg text-sm truncate transition-colors",
+                  activeId === album.id
+                    ? "bg-[var(--color-accent)] text-white font-medium"
+                    : "text-[var(--color-fg)] hover:bg-[var(--color-canvas-subtle)]",
+                ]}
+              >
+                {album.albumName}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </nav>
 </aside>
