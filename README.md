@@ -12,7 +12,7 @@ Aplikasi galeri dokumentasi kegiatan berbasis Astro yang mengambil data album da
 
 ## Stack Teknis
 
-- Framework: Astro 6 (mode `server`, adapter `@astrojs/node` standalone)
+- Framework: Astro 7 (mode `server`, adapter `@astrojs/node` standalone)
 - Styling: Tailwind CSS v4 (via plugin Vite)
 - Image processing: sharp (generate icon PWA)
 - Runtime: Node.js >= 22.12.0
