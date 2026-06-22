@@ -52,7 +52,11 @@ export async function getAllAlbums(): Promise<ImmichAlbum[]> {
     const res = await fetch(`${BASE_URL}/api/albums?shared=true`, { headers: HEADERS });
     if (!res.ok) throw new Error(`Gagal fetch albums: ${res.statusText}`);
     const all: ImmichAlbum[] = await res.json();
-    return all.filter((a) => a.shared && !isExcludedAlbum(a));
+    return all
+        .filter((a) => a.shared && !isExcludedAlbum(a))
+        .sort((a, b) =>
+            a.albumName.localeCompare(b.albumName, "id", { numeric: true, sensitivity: "base" })
+        );
 }
 
 export async function getAlbumById(albumId: string): Promise<ImmichAlbumDetail> {
