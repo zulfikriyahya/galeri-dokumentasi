@@ -175,6 +175,23 @@ function metaFor(asset: ImmichAsset): string {
     document.querySelectorAll<HTMLButtonElement>(".slider-img-btn"),
   );
 
+  const tracks = Array.from(
+    document.querySelectorAll<HTMLElement>(".zigzag-track"),
+  );
+
+  tracks.forEach((track) => {
+    const pause = () => {
+      track.style.animationPlayState = "paused";
+    };
+    const resume = () => {
+      track.style.animationPlayState = "running";
+    };
+    track.addEventListener("pointerdown", pause);
+    track.addEventListener("pointerup", resume);
+    track.addEventListener("pointercancel", resume);
+    track.addEventListener("pointerleave", resume);
+  });
+
   function open(btn: HTMLButtonElement) {
     lb.classList.remove("hidden");
     document.body.style.overflow = "hidden";
