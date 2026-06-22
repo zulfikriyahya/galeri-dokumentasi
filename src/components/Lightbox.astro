@@ -52,11 +52,10 @@ const images = assets.filter((a) => a.type === "IMAGE");
           aria-label={`Buka foto ${asset.originalFileName}`}
         >
           <img
-            src={getThumbnailUrl(asset.id, "thumbnail")}
+            data-src={getThumbnailUrl(asset.id, "thumbnail")}
             alt={asset.exifInfo?.description || asset.originalFileName}
-            loading="lazy"
             decoding="async"
-            class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 ease-out block"
+            class="lazy-img w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 ease-out block"
           />
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 rounded-xl" />
           <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -197,6 +196,24 @@ const images = assets.filter((a) => a.type === "IMAGE");
 </div>
 
 <script>
+  const lazyImgs = document.querySelectorAll<HTMLImageElement>(".lazy-img");
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const img = entry.target as HTMLImageElement;
+        const src = img.dataset.src;
+        if (src) {
+          img.src = src;
+          delete img.dataset.src;
+        }
+        io.unobserve(img);
+      });
+    },
+    { rootMargin: "0px 0px 300px 0px" },
+  );
+  lazyImgs.forEach((img) => io.observe(img));
+
   const lb = document.getElementById("lightbox")!;
   const lbImg = document.getElementById("lb-img") as HTMLImageElement;
   const lbName = document.getElementById("lb-name")!;

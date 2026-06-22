@@ -37,11 +37,10 @@ function metaFor(asset: ImmichAsset): string {
             aria-label={`Buka foto ${asset.originalFileName}`}
           >
             <img
-              src={getThumbnailUrl(asset.id, "thumbnail")}
+              data-src={getThumbnailUrl(asset.id, "thumbnail")}
               alt={asset.exifInfo?.description || asset.originalFileName}
-              loading="lazy"
               decoding="async"
-              class="h-full w-auto object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out block"
+              class="lazy-img h-full w-auto object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out block"
             />
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 pointer-events-none" />
           </button>
@@ -63,11 +62,10 @@ function metaFor(asset: ImmichAsset): string {
             aria-label={`Buka foto ${asset.originalFileName}`}
           >
             <img
-              src={getThumbnailUrl(asset.id, "thumbnail")}
+              data-src={getThumbnailUrl(asset.id, "thumbnail")}
               alt={asset.exifInfo?.description || asset.originalFileName}
-              loading="lazy"
               decoding="async"
-              class="h-full w-auto object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out block"
+              class="lazy-img h-full w-auto object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out block"
             />
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 pointer-events-none" />
           </button>
@@ -170,6 +168,24 @@ function metaFor(asset: ImmichAsset): string {
   ) as HTMLAnchorElement;
   const btnClose = document.getElementById("slider-lb-close")!;
   const backdrop = document.getElementById("slider-lb-backdrop")!;
+
+  const lazyImgs = document.querySelectorAll<HTMLImageElement>(".lazy-img");
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const img = entry.target as HTMLImageElement;
+        const src = img.dataset.src;
+        if (src) {
+          img.src = src;
+          delete img.dataset.src;
+        }
+        io.unobserve(img);
+      });
+    },
+    { rootMargin: "0px 200px 0px 200px" },
+  );
+  lazyImgs.forEach((img) => io.observe(img));
 
   const buttons = Array.from(
     document.querySelectorAll<HTMLButtonElement>(".slider-img-btn"),
