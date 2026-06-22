@@ -24,9 +24,9 @@ export const GET: APIRoute = async () => {
     const albumUrls = albums.map((a) => {
         const cover = getAlbumCoverUrl(a);
         const image = cover
-            ? `<image:image><image:loc>${SITE_URL}${cover}</image:loc><image:title>${escapeXml(a.albumName)}</image:title></image:image>`
+            ? `<image:image><image:loc>${escapeXml(`${SITE_URL}${cover}`)}</image:loc><image:title>${escapeXml(a.albumName)}</image:title></image:image>`
             : "";
-        return `<url><loc>${SITE_URL}/albums/${a.id}</loc><lastmod>${new Date(a.updatedAt).toISOString()}</lastmod><priority>0.6</priority>${image}</url>`;
+        return `<url><loc>${escapeXml(`${SITE_URL}/albums/${a.id}`)}</loc><lastmod>${new Date(a.updatedAt).toISOString()}</lastmod><priority>0.6</priority>${image}</url>`;
     });
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
