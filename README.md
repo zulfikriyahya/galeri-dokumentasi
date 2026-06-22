@@ -2,6 +2,14 @@
 
 Aplikasi galeri dokumentasi kegiatan berbasis Astro yang mengambil data album dan foto dari Immich melalui API, ditampilkan dalam bentuk situs publik dengan dukungan PWA, SEO, dan caching gambar.
 
+## Preview
+
+### Phone 
+![Smartphone View](/public/screenshot/smartphone.png)
+
+### Desktop
+![Desktop View](/public/screenshot/desktop.png)
+
 ## Stack Teknis
 
 - Framework: Astro 6 (mode `server`, adapter `@astrojs/node` standalone)
