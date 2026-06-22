@@ -22,6 +22,14 @@ const SOCIAL_INSTAGRAM_URL = import.meta.env.SOCIAL_INSTAGRAM_URL;
 const SOCIAL_YOUTUBE_URL = import.meta.env.SOCIAL_YOUTUBE_URL;
 const UPLOAD_URL = import.meta.env.UPLOAD_URL;
 
+const DEVELOPER_NAME = import.meta.env.DEVELOPER_NAME ?? "Yahya Zulfikri";
+const DEVELOPER_ROLE =
+  import.meta.env.DEVELOPER_ROLE ?? "Staf Tata Usaha & IT Madrasah";
+const DEVELOPER_URL =
+  import.meta.env.DEVELOPER_URL ?? "https://github.com/zulfikriyahya";
+const DEVELOPER_INSTAGRAM_URL = import.meta.env.DEVELOPER_INSTAGRAM_URL;
+const DEVELOPER_LINKEDIN_URL = import.meta.env.DEVELOPER_LINKEDIN_URL;
+
 const {
   title = SITE_NAME,
   description = SITE_DESCRIPTION,
@@ -40,6 +48,34 @@ const resolvedOgImage = ogImage
 const isHome = activePath === "/";
 const isAlbums = activePath.startsWith("/albums");
 const year = new Date().getFullYear();
+
+const developerPerson = {
+  "@type": "Person",
+  name: DEVELOPER_NAME,
+  jobTitle: DEVELOPER_ROLE,
+  url: DEVELOPER_URL,
+  sameAs: [
+    DEVELOPER_URL,
+    DEVELOPER_INSTAGRAM_URL,
+    DEVELOPER_LINKEDIN_URL,
+  ].filter(Boolean),
+  worksFor: {
+    "@type": "EducationalOrganization",
+    name: SCHOOL_NAME,
+  },
+  description:
+    "Staf Tata Usaha dan satu-satunya tenaga IT di MTs Negeri 1 Pandeglang yang membangun infrastruktur dan kebutuhan IT madrasah dari awal hingga terus dikembangkan sampai saat ini, serta berperan dalam pengembangan sistem IT di beberapa sekolah/madrasah lain di Kabupaten Pandeglang. Juga aktif sebagai bagian dari Humas, Kurikulum, dan Kesiswaan MTsN 1 Pandeglang.",
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: title,
+  url: SITE_URL || Astro.url.origin,
+  description,
+  creator: developerPerson,
+  author: developerPerson,
+};
 ---
 
 <html lang="id">
@@ -73,7 +109,12 @@ const year = new Date().getFullYear();
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="author" content={DEVELOPER_NAME} />
     <title>{title}</title>
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(websiteJsonLd)}
+    />
     <script is:inline>
       (function () {
         var s = localStorage.getItem("theme");
