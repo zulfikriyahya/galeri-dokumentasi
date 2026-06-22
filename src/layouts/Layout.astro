@@ -5,8 +5,10 @@ interface Props {
   title?: string;
   description?: string;
   activePath?: string;
+  ogImage?: string;
+  canonicalUrl?: string;
 }
-
+const SITE_URL = import.meta.env.SITE_URL ?? "";
 const SITE_NAME = import.meta.env.SITE_NAME ?? "GALERI DOKUMENTASI";
 const SITE_SHORT_NAME = import.meta.env.SITE_SHORT_NAME ?? "DOKUMENTASI";
 const SITE_DESCRIPTION =
@@ -24,7 +26,16 @@ const {
   title = SITE_NAME,
   description = SITE_DESCRIPTION,
   activePath = Astro.url.pathname,
+  ogImage,
+  canonicalUrl,
 } = Astro.props;
+
+const resolvedCanonical = canonicalUrl ?? `${SITE_URL}${activePath}`;
+const resolvedOgImage = ogImage
+  ? ogImage.startsWith("http")
+    ? ogImage
+    : `${SITE_URL}${ogImage}`
+  : `${SITE_URL}/og.png`;
 
 const isHome = activePath === "/";
 const isAlbums = activePath.startsWith("/albums");
@@ -48,10 +59,17 @@ const year = new Date().getFullYear();
     />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="/og.png" />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:url" content={resolvedCanonical} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={resolvedOgImage} />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content={SITE_SHORT_NAME} />
+    <link rel="canonical" href={resolvedCanonical} />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

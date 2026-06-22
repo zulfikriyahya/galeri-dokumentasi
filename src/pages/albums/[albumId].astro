@@ -1,7 +1,13 @@
 ---
 export const prerender = false;
 
-import { getAllAlbums, getAlbumById, isExcludedAlbum } from "../../lib/immich";
+import {
+  getAllAlbums,
+  getAlbumById,
+  isExcludedAlbum,
+  getAlbumCoverUrl,
+  getThumbnailUrl,
+} from "../../lib/immich";
 import Lightbox from "../../components/Lightbox.astro";
 import Layout from "../../layouts/Layout.astro";
 import Sidebar from "../../components/Sidebar.astro";
@@ -20,11 +26,28 @@ try {
 
 if (!album.shared || isExcludedAlbum(album)) return Astro.redirect("/albums");
 
+const coverUrl = getAlbumCoverUrl(album);
+const SITE_URL = import.meta.env.SITE_URL ?? "";
+
 const imageCount = album.assets.filter((a) => a.type === "IMAGE").length;
 const albumDate = new Date(album.createdAt).toLocaleDateString("id-ID", {
   dateStyle: "long",
 });
 const pageUrl = Astro.url.href;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ImageGallery",
+  name: album.albumName,
+  description: album.description || `${album.albumName} — ${imageCount} foto`,
+  url: pageUrl,
+  associatedMedia: album.assets
+    .filter((a) => a.type === "IMAGE")
+    .map((a) => ({
+      "@type": "ImageObject",
+      contentUrl: `${SITE_URL}${getThumbnailUrl(a.id, "preview")}`,
+      name: a.exifInfo?.description || a.originalFileName,
+    })),
+};
 const shareTitle = `${album.albumName} — ${SITE_NAME}`;
 const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + "\n" + pageUrl)}`;
 const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
@@ -34,7 +57,13 @@ const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent
   title={`${album.albumName} — ${SITE_NAME}`}
   description={album.description || `${album.albumName} — ${imageCount} foto`}
   activePath={`/albums/${albumId}`}
+  ogImage={coverUrl ?? undefined}
 >
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+    slot="head"
+  />
   <Sidebar slot="sidebar" albums={albums} activeId={album.id} />
 
   <div class="px-5 sm:px-7 py-10">

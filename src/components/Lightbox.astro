@@ -53,7 +53,7 @@ const images = assets.filter((a) => a.type === "IMAGE");
         >
           <img
             src={getThumbnailUrl(asset.id, "thumbnail")}
-            alt={asset.originalFileName}
+            alt={asset.exifInfo?.description || asset.originalFileName}
             loading="lazy"
             decoding="async"
             class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 ease-out block"

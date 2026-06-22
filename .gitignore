@@ -27,4 +27,4 @@ pnpm-debug.log*
 
 public/*.svg
 public/*.png
-public/icons/*.png
+public/icons/*

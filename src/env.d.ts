@@ -12,6 +12,7 @@ interface ImportMetaEnv {
     readonly SOCIAL_INSTAGRAM_URL: string;
     readonly SOCIAL_YOUTUBE_URL: string;
     readonly UPLOAD_URL: string;
+    readonly SITE_URL: string;
 }
 
 interface ImportMeta {
