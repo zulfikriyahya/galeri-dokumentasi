@@ -25,5 +25,6 @@ pnpm-debug.log*
 
 # disable sementara
 
-*.svg
-*.png
+public/*.svg
+public/*.png
+public/icons/*.png
