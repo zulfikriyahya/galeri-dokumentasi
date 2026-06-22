@@ -79,7 +79,7 @@ export function getAlbumShareUrl(albumId: string): string {
 
 export function getAlbumCoverUrl(album: ImmichAlbum): string | null {
     if (!album.albumThumbnailAssetId) return null;
-    return getThumbnailUrl(album.albumThumbnailAssetId, "preview");
+    return getThumbnailUrl(album.albumThumbnailAssetId, "thumbnail");
 }
 
 export async function getRecentAssets(limit = 30): Promise<ImmichAsset[]> {

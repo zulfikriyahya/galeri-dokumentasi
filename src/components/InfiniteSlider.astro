@@ -37,7 +37,7 @@ function metaFor(asset: ImmichAsset): string {
             aria-label={`Buka foto ${asset.originalFileName}`}
           >
             <img
-              src={getThumbnailUrl(asset.id, "preview")}
+              src={getThumbnailUrl(asset.id, "thumbnail")}
               alt={asset.exifInfo?.description || asset.originalFileName}
               loading="lazy"
               decoding="async"
@@ -63,7 +63,7 @@ function metaFor(asset: ImmichAsset): string {
             aria-label={`Buka foto ${asset.originalFileName}`}
           >
             <img
-              src={getThumbnailUrl(asset.id, "preview")}
+              src={getThumbnailUrl(asset.id, "thumbnail")}
               alt={asset.exifInfo?.description || asset.originalFileName}
               loading="lazy"
               decoding="async"
