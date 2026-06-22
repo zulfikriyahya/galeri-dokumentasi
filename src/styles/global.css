@@ -77,13 +77,24 @@ body {
         transition: padding-left 0.28s ease;
     }
 
-    body.sb-collapsed #app-sidebar {
+    html.sb-collapsed #app-sidebar {
         width: var(--sb-width-collapsed);
     }
 
-    body.sb-collapsed #app-content {
+    html.sb-collapsed #app-content {
         padding-left: var(--sb-width-collapsed);
     }
+}
+
+html.sb-collapsed #app-sidebar .sb-label,
+html.sb-collapsed #app-sidebar .sb-expanded {
+    display: none;
+}
+
+html.sb-collapsed #app-sidebar .sb-nav-item {
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
 /* ── Sidebar collapsed state ────────────────────────────────── */

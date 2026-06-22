@@ -122,7 +122,7 @@ const websiteJsonLd = {
         if ((s ?? (d ? "dark" : "light")) === "dark")
           document.documentElement.classList.add("dark");
         if (localStorage.getItem("sb-collapsed") === "1")
-          document.body.classList.add("sb-collapsed");
+          document.documentElement.classList.add("sb-collapsed");
       })();
     </script>
   </head>
@@ -436,7 +436,7 @@ const websiteJsonLd = {
       var sbToggle = document.getElementById("sidebar-toggle");
       sbToggle &&
         sbToggle.addEventListener("click", function () {
-          var c = document.body.classList.toggle("sb-collapsed");
+          var c = document.documentElement.classList.toggle("sb-collapsed");
           localStorage.setItem("sb-collapsed", c ? "1" : "0");
           var iconOpen = sbToggle.querySelector(".sidebar-icon-open");
           var iconClosed = sbToggle.querySelector(".sidebar-icon-closed");
@@ -450,8 +450,9 @@ const websiteJsonLd = {
         });
 
       (function () {
-        var c = document.body.classList.contains("sb-collapsed");
+        var c = document.documentElement.classList.contains("sb-collapsed");
         var sbToggle = document.getElementById("sidebar-toggle");
+
         if (!sbToggle) return;
         var iconOpen = sbToggle.querySelector(".sidebar-icon-open");
         var iconClosed = sbToggle.querySelector(".sidebar-icon-closed");
