@@ -3,16 +3,18 @@
 ### File: `./.env`
 
 ```
-IMMICH_BASE_URL=https://galeri-rohis.zedlabs.id
-IMMICH_API_KEY=NUaPrJHlmuJJQAiaOWgXgKl2grOR2PzX9pnotGw
+IMMICH_BASE_URL=https://galeri.mtsn1pandeglang.sch.id
+IMMICH_API_KEY=iAoSqQJRJgTc9j5TxVnHQo3lX030HDRnnv08q8tXeWY
 
-SITE_NAME=DOKUMENTASI ROHIS
-SITE_SHORT_NAME=DOKUMENTASI ROHIS
+SITE_NAME=DOKUMENTASI MADRASAH
+SITE_SHORT_NAME=DOKUMENTASI MADRASAH
 SITE_DESCRIPTION=Dokumentasi kegiatan dalam satu tempat.
-ORG_NAME=ROHIS
-SCHOOL_NAME=SMKN 1 PANDEGLANG
+ORG_NAME=DOKUMENTASI
+SCHOOL_NAME=MTSN 1 PANDEGLANG
 POWERED_BY=ZEDLABS TEKNOLOGI INDONESIA
 POWERED_BY_URL=https://zedlabs.id
+EXCLUDED_ALBUM_KEYWORDS=UNGGAH DOKUMENTASI
+
 ```
 
 ---
@@ -25,12 +27,38 @@ import node from "@astrojs/node";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-    output: "static",
+    output: "server",
     adapter: node({ mode: "standalone" }),
     vite: {
         plugins: [tailwindcss()],
     },
 });
+
+```
+
+---
+
+### File: `./ecosystem.config.cjs`
+
+```javascript
+module.exports = {
+    apps: [
+        {
+            name: "dokumentasi-madrasah",
+            script: "./dist/server/entry.mjs",
+            interpreter: "node",
+            instances: 1,
+            autorestart: true,
+            watch: false,
+            max_memory_restart: "512M",
+            env: {
+                NODE_ENV: "production",
+                HOST: "0.0.0.0",
+                PORT: 4322,
+            },
+        },
+    ],
+};
 ```
 
 ---
@@ -39,7 +67,7 @@ export default defineConfig({
 
 ```json
 {
-  "name": "",
+  "name": "galeri-dokumentasi",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -83,10 +111,60 @@ allowBuilds:
 ```json
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ]
+}
+```
+
+---
+
+## Direktory: nginx
+
+### File: `./nginx/config.nginx`
+
+```
+server {
+    listen 80;
+    server_name dokumentasi.mtsn1pandeglang.sch.id;
+    return 301 https://$host$request_uri;
 }
 
+server {
+    listen 443 ssl;
+    server_name dokumentasi.mtsn1pandeglang.sch.id;
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    location / {
+        proxy_pass http://127.0.0.1:4322;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 60s;
+    }
+
+    location ~* \.(ico|svg|png|jpg|jpeg|webp|woff2|woff|ttf)$ {
+        proxy_pass http://127.0.0.1:4322;
+        proxy_cache_valid 200 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+    }
+
+    location ~* \.(css|js)$ {
+        proxy_pass http://127.0.0.1:4322;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+}
 ```
 
 ---
@@ -152,51 +230,306 @@ self.addEventListener("fetch", (e) => {
         );
     }
 });
+
 ```
 
 ---
 
 ## Direktory: scripts
 
+### File: `./scripts/deploy.sh`
+
+```bash
+#!/bin/bash
+
+set -e
+
+GREEN="\e[32m"
+BLUE="\e[34m"
+YELLOW="\e[33m"
+RED="\e[31m"
+RESET="\e[0m"
+
+info()    { echo -e "${BLUE}==>${RESET} $1"; }
+success() { echo -e "${GREEN}==>${RESET} $1"; }
+warn()    { echo -e "${YELLOW}==>${RESET} $1"; }
+error()   { echo -e "${RED}==>${RESET} $1"; exit 1; }
+
+ask() {
+  local prompt="$1"
+  local default="$2"
+  local value
+  if [ -n "$default" ]; then
+    read -p "$(echo -e "${YELLOW}?${RESET} $prompt [$default]: ")" value
+    echo "${value:-$default}"
+  else
+    read -p "$(echo -e "${YELLOW}?${RESET} $prompt: ")" value
+    echo "$value"
+  fi
+}
+
+ask_secret() {
+  local prompt="$1"
+  local value
+  read -s -p "$(echo -e "${YELLOW}?${RESET} $prompt: ")" value
+  echo ""
+  echo "$value"
+}
+
+confirm() {
+  local prompt="$1"
+  local answer
+  read -p "$(echo -e "${YELLOW}?${RESET} $prompt [y/N]: ")" answer
+  [[ "$answer" =~ ^[Yy]$ ]]
+}
+
+echo ""
+echo -e "${BLUE}╔══════════════════════════════════════╗${RESET}"
+echo -e "${BLUE}║     DEPLOY DOKUMENTASI - ZEDLABS     ║${RESET}"
+echo -e "${BLUE}╚══════════════════════════════════════╝${RESET}"
+echo ""
+
+# ── Konfigurasi awal ────────────────────────────────────────────
+info "Konfigurasi Aplikasi"
+APP_NAME=$(ask "Nama aplikasi" "galeri-dokumentasi")
+APP_DIR="/var/www/$APP_NAME"
+REPO_URL=$(ask "URL repository Git" "https://github.com/zulfikriyahya/galeri-dokumentasi")
+BRANCH=$(ask "Branch" "main")
+PORT=$(ask "Port aplikasi" "4321")
+
+echo ""
+info "Konfigurasi .env"
+IMMICH_BASE_URL=$(ask "IMMICH_BASE_URL" "https://")
+IMMICH_API_KEY=$(ask_secret "IMMICH_API_KEY")
+SITE_NAME=$(ask "SITE_NAME" "DOKUMENTASI ROHIS")
+SITE_SHORT_NAME=$(ask "SITE_SHORT_NAME" "DOKUMENTASI ROHIS")
+SITE_DESCRIPTION=$(ask "SITE_DESCRIPTION" "Dokumentasi kegiatan dalam satu tempat.")
+ORG_NAME=$(ask "ORG_NAME" "ROHIS")
+SCHOOL_NAME=$(ask "SCHOOL_NAME" "SMKN 1 PANDEGLANG")
+POWERED_BY=$(ask "POWERED_BY" "ZEDLABS TEKNOLOGI INDONESIA")
+POWERED_BY_URL=$(ask "POWERED_BY_URL" "https://zedlabs.id")
+EXCLUDED_ALBUM_KEYWORDS=$(ask "EXCLUDED_ALBUM_KEYWORDS (pisah koma)" "UNGGAH DOKUMENTASI")
+
+echo ""
+info "Konfigurasi Nginx"
+DOMAIN=$(ask "Domain" "galeri.zedlabs.id")
+USE_SSL=$(confirm "Setup SSL dengan Certbot?" && echo "yes" || echo "no")
+
+echo ""
+echo -e "${BLUE}──────────────────────────────────────${RESET}"
+echo -e "  Nama Aplikasi : ${GREEN}$APP_NAME${RESET}"
+echo -e "  Direktori     : ${GREEN}$APP_DIR${RESET}"
+echo -e "  Repository    : ${GREEN}$REPO_URL${RESET}"
+echo -e "  Branch        : ${GREEN}$BRANCH${RESET}"
+echo -e "  Port          : ${GREEN}$PORT${RESET}"
+echo -e "  Domain        : ${GREEN}$DOMAIN${RESET}"
+echo -e "  SSL           : ${GREEN}$USE_SSL${RESET}"
+echo -e "${BLUE}──────────────────────────────────────${RESET}"
+echo ""
+
+confirm "Lanjutkan deploy?" || error "Deploy dibatalkan."
+
+# ── Install dependencies sistem ──────────────────────────────────
+echo ""
+info "Update sistem..."
+apt update -y
+
+if ! command -v nginx &>/dev/null; then
+  info "Install Nginx..."
+  apt install -y nginx
+  systemctl enable nginx
+  success "Nginx terinstall."
+else
+  warn "Nginx sudah terinstall, dilewati."
+fi
+
+if ! command -v node &>/dev/null; then
+  info "Install Node.js 26..."
+  apt install -y curl
+  curl -fsSL https://deb.nodesource.com/setup_26.x | bash -
+  apt install -y nodejs
+  success "Node.js terinstall: $(node -v)"
+else
+  warn "Node.js sudah terinstall: $(node -v)"
+fi
+
+if ! command -v pnpm &>/dev/null; then
+  info "Install pnpm..."
+  npm install -g pnpm
+  success "pnpm terinstall: $(pnpm -v)"
+else
+  warn "pnpm sudah terinstall: $(pnpm -v)"
+fi
+
+if ! command -v pm2 &>/dev/null; then
+  info "Install pm2..."
+  npm install -g pm2
+  success "pm2 terinstall."
+else
+  warn "pm2 sudah terinstall."
+fi
+
+if [ "$USE_SSL" = "yes" ] && ! command -v certbot &>/dev/null; then
+  info "Install Certbot..."
+  apt install -y certbot python3-certbot-nginx
+  success "Certbot terinstall."
+fi
+
+# ── Clone / Pull repository ──────────────────────────────────────
+echo ""
+if [ ! -d "$APP_DIR" ]; then
+  info "Clone repository ke $APP_DIR..."
+  git clone -b $BRANCH $REPO_URL $APP_DIR
+else
+  info "Pull update terbaru..."
+  cd $APP_DIR && git pull origin $BRANCH
+fi
+
+# ── Buat file .env ───────────────────────────────────────────────
+echo ""
+info "Membuat file .env..."
+cat > "$APP_DIR/.env" <<EOF
+IMMICH_BASE_URL=$IMMICH_BASE_URL
+IMMICH_API_KEY=$IMMICH_API_KEY
+
+SITE_NAME=$SITE_NAME
+SITE_SHORT_NAME=$SITE_SHORT_NAME
+SITE_DESCRIPTION=$SITE_DESCRIPTION
+ORG_NAME=$ORG_NAME
+SCHOOL_NAME=$SCHOOL_NAME
+POWERED_BY=$POWERED_BY
+POWERED_BY_URL=$POWERED_BY_URL
+EXCLUDED_ALBUM_KEYWORDS=$EXCLUDED_ALBUM_KEYWORDS
+EOF
+success ".env berhasil dibuat."
+
+# ── Buat ecosystem.config.cjs ────────────────────────────────────
+echo ""
+info "Membuat ecosystem.config.cjs..."
+cat > "$APP_DIR/ecosystem.config.cjs" <<EOF
+module.exports = {
+  apps: [
+    {
+      name: "$APP_NAME",
+      script: "./dist/server/entry.mjs",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "512M",
+      env: {
+        NODE_ENV: "production",
+        HOST: "127.0.0.1",
+        PORT: $PORT,
+      },
+    },
+  ],
+};
+EOF
+success "ecosystem.config.cjs berhasil dibuat."
+
+# ── Konfigurasi Nginx ────────────────────────────────────────────
+echo ""
+info "Membuat konfigurasi Nginx..."
+NGINX_CONF="/etc/nginx/sites-available/$APP_NAME"
+
+cat > "$NGINX_CONF" <<EOF
+server {
+    listen 80;
+    server_name $DOMAIN;
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    location / {
+        proxy_pass http://127.0.0.1:$PORT;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 60s;
+    }
+
+    location ~* \.(ico|svg|png|jpg|jpeg|webp|woff2|woff|ttf)$ {
+        proxy_pass http://127.0.0.1:$PORT;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+    }
+
+    location ~* \.(css|js)$ {
+        proxy_pass http://127.0.0.1:$PORT;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+}
+EOF
+
+ln -sf "$NGINX_CONF" "/etc/nginx/sites-enabled/$APP_NAME"
+nginx -t && systemctl reload nginx
+success "Nginx berhasil dikonfigurasi."
+
+# ── SSL ──────────────────────────────────────────────────────────
+if [ "$USE_SSL" = "yes" ]; then
+  echo ""
+  info "Setup SSL untuk $DOMAIN..."
+  certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m admin@$DOMAIN
+  success "SSL berhasil dipasang."
+fi
+
+# ── Build aplikasi ───────────────────────────────────────────────
+echo ""
+cd "$APP_DIR"
+
+info "Install dependencies..."
+pnpm install --frozen-lockfile
+
+info "Generate icons..."
+node scripts/gen-icon.mjs
+
+info "Build aplikasi..."
+pnpm build
+
+# ── Jalankan dengan pm2 ──────────────────────────────────────────
+echo ""
+info "Menjalankan aplikasi dengan pm2..."
+if pm2 list | grep -q "$APP_NAME"; then
+  pm2 restart $APP_NAME
+else
+  pm2 start ecosystem.config.cjs
+fi
+
+pm2 save
+pm2 startup | tail -1 | bash 2>/dev/null || true
+
+echo ""
+echo -e "${GREEN}╔══════════════════════════════════════╗${RESET}"
+echo -e "${GREEN}║         DEPLOY BERHASIL!             ║${RESET}"
+echo -e "${GREEN}╚══════════════════════════════════════╝${RESET}"
+echo ""
+echo -e "  URL     : ${GREEN}http${USE_SSL:+s}://$DOMAIN${RESET}"
+echo -e "  PM2     : ${GREEN}pm2 status${RESET}"
+echo -e "  Log     : ${GREEN}pm2 logs $APP_NAME${RESET}"
+echo ""
+```
+
+---
+
 ### File: `./scripts/gen-icon.mjs`
 
 ```javascript
 import sharp from "sharp";
-import { writeFileSync, mkdirSync } from "fs";
+import { readFileSync, mkdirSync } from "fs";
 
 mkdirSync("public/icons", { recursive: true });
 
-function generateSVG(size) {
-    const r = size * 0.2;
-    const pad = size * 0.14;
-    const gap = size * 0.06;
-    const half = (size - pad * 2 - gap) / 2;
-    const innerR = size * 0.06;
+const svg = readFileSync("public/favicon.svg");
 
-    return `
-    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="${size}" height="${size}" rx="${r}" fill="#0969da" />
-        
-        <rect x="${pad}" y="${pad}" width="${half}" height="${half}" rx="${innerR}" fill="rgba(255,255,255,1)" />
-        <rect x="${pad + half + gap}" y="${pad}" width="${half}" height="${half}" rx="${innerR}" fill="rgba(255,255,255,0.7)" />
-        <rect x="${pad}" y="${pad + half + gap}" width="${half}" height="${half}" rx="${innerR}" fill="rgba(255,255,255,0.7)" />
-        <rect x="${pad + half + gap}" y="${pad + half + gap}" width="${half}" height="${half}" rx="${innerR}" fill="rgba(255,255,255,0.5)" />
-    </svg>
-    `;
-}
+await sharp(svg).resize(192).png().toFile("public/icons/icon-192.png");
+await sharp(svg).resize(512).png().toFile("public/icons/icon-512.png");
+await sharp(svg).resize(1200).png().toFile("public/og.png");
 
-async function createIcons() {
-    const svg192 = Buffer.from(generateSVG(192));
-    const svg512 = Buffer.from(generateSVG(512));
-
-    await sharp(svg192).png().toFile("public/icons/icon-192.png");
-    await sharp(svg512).png().toFile("public/icons/icon-512.png");
-    await sharp(svg512).png().toFile("public/og.png");
-
-    console.log("🚀 Icons successfully generated via sharp!");
-}
-
-createIcons().catch(console.error);
+console.log("Icons successfully generated from favicon.svg!");
 ```
 
 ---
@@ -727,51 +1060,16 @@ const isAlbumPage = currentPath.startsWith("/albums/");
   <div
     class="flex items-center h-14 px-3 border-b border-[var(--glass-border)] shrink-0 gap-2 overflow-hidden"
   >
-    <!-- <span
-      class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="white"
-        stroke-width="2"
-        class="w-3.5 h-3.5"
-      >
-        <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-        <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-        <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-        <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-      </svg>
-    </span>
-    <span
-      class="sb-label text-xs font-semibold text-[var(--color-fg-subtle)] uppercase tracking-widest truncate whitespace-nowrap"
-    >
-      Navigasi
-    </span> -->
     <a
       href="/"
-      class="flex items-center gap-2 font-semibold tracking-tight text-[var(--color-fg)] text-sm"
+      class="flex items-center gap-2 font-semibold tracking-tight text-[var(--color-fg)] text-sm min-w-0"
     >
       <span
-        class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--color-accent)] shrink-0"
+        class="inline-flex items-center justify-center w-7 h-7 rounded-lg border border-[var(--color-border)] shrink-0 overflow-hidden p-1"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="white"
-          stroke-width="2"
-          class="w-3.5 h-3.5"
-        >
-          <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-          <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-          <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-          <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-        </svg>
+        <img src="/favicon.svg" class="w-full h-full object-contain" />
       </span>
-      <span class="hidden sm:block leading-tight">{SITE_NAME}</span>
-      <span class="sm:hidden leading-tight">{SITE_SHORT_NAME}</span>
+      <span class="sb-label leading-tight truncate">{SITE_NAME}</span>
     </a>
   </div>
 
@@ -883,11 +1181,13 @@ interface ImportMetaEnv {
     readonly SCHOOL_NAME: string;
     readonly POWERED_BY: string;
     readonly POWERED_BY_URL: string;
+    readonly EXCLUDED_ALBUM_KEYWORDS: string;
 }
 
 interface ImportMeta {
     readonly env: ImportMetaEnv;
 }
+
 ```
 
 ---
@@ -971,7 +1271,7 @@ const year = new Date().getFullYear();
       <header
         class="glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-5 h-14 border-b border-[var(--glass-border)] shrink-0"
       >
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
           <button
             id="sidebar-toggle"
             type="button"
@@ -984,45 +1284,99 @@ const year = new Date().getFullYear();
               fill="none"
               stroke="currentColor"
               stroke-width="2"
+              class="w-4 h-4 sidebar-icon-open"
+            >
+              <rect x="3" y="3" width="7" height="18" rx="1.5" opacity="0.3"
+              ></rect>
+              <line x1="14" y1="7" x2="21" y2="7"></line>
+              <line x1="14" y1="12" x2="21" y2="12"></line>
+              <line x1="14" y1="17" x2="21" y2="17"></line>
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4 sidebar-icon-closed hidden"
+            >
+              <rect x="14" y="3" width="7" height="18" rx="1.5" opacity="0.3"
+              ></rect>
+              <line x1="3" y1="7" x2="10" y2="7"></line>
+              <line x1="3" y1="12" x2="10" y2="12"></line>
+              <line x1="3" y1="17" x2="10" y2="17"></line>
+            </svg>
+          </button>
+          <a
+            href="/"
+            class="lg:hidden flex items-center gap-2.5 font-semibold
+          tracking-tight text-[var(--color-fg)] text-sm"
+          >
+            <span
+              class="inline-flex items-center justify-center w-7 h-7 rounded-lg border border-[var(--color-border)] shrink-0 overflow-hidden p-1"
+            >
+              <img src="/favicon.svg" class="w-full h-full object-contain" />
+            </span>
+            <span class="leading-tight truncate max-w-[160px] sm:max-w-xs"
+              >{SITE_SHORT_NAME}</span
+            >
+          </a>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a
+            href="https://github.com/zulfikriyahya"
+            target="_blank"
+            rel="noopener
+        noreferrer"
+            aria-label="GitHub"
+            class="w-8 h-8 flex items-center
+        justify-center rounded-lg border border-[var(--color-border-muted)]
+        hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)]
+        transition-all duration-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
               class="w-4 h-4"
             >
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+              ></path>
+            </svg>
+          </a>
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Ganti tema"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4 hidden dark:block"
+            >
+              <circle cx="12" cy="12" r="4"></circle>
+              <path
+                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+              ></path>
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="w-4 h-4 block dark:hidden"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </button>
         </div>
-
-        <button
-          id="theme-toggle"
-          type="button"
-          aria-label="Ganti tema"
-          class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="w-4 h-4 hidden dark:block"
-          >
-            <circle cx="12" cy="12" r="4"></circle>
-            <path
-              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
-            ></path>
-          </svg>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="w-4 h-4 block dark:hidden"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </button>
       </header>
 
       <main class="flex-1 pb-20 lg:pb-0">
@@ -1055,10 +1409,7 @@ const year = new Date().getFullYear();
       class="mobile-nav fixed bottom-0 left-0 right-0 z-40 lg:hidden glass border-t border-[var(--glass-border)]"
       aria-label="Navigasi utama"
     >
-      <div
-        class="flex items-stretch h-16"
-        style="max-width:360px;margin:0 auto"
-      >
+      <div class="flex items-stretch h-16 max-w-sm mx-auto">
         <a
           href="/"
           aria-label="Beranda"
@@ -1110,21 +1461,9 @@ const year = new Date().getFullYear();
       >
         <div class="flex items-start gap-3 mb-3">
           <span
-            class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--color-accent)] shrink-0 mt-0.5"
+            class="flex items-center justify-center w-9 h-9 rounded-xl border border-[var(--color-border)] shrink-0 overflow-hidden p-1"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              stroke-width="2"
-              class="w-4 h-4"
-            >
-              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-            </svg>
+            <img src="/favicon.svg" class="w-full h-full object-contain" />
           </span>
           <div>
             <p
@@ -1165,7 +1504,28 @@ const year = new Date().getFullYear();
         sbToggle.addEventListener("click", function () {
           var c = document.body.classList.toggle("sb-collapsed");
           localStorage.setItem("sb-collapsed", c ? "1" : "0");
+          var iconOpen = sbToggle.querySelector(".sidebar-icon-open");
+          var iconClosed = sbToggle.querySelector(".sidebar-icon-closed");
+          if (c) {
+            iconOpen && iconOpen.classList.add("hidden");
+            iconClosed && iconClosed.classList.remove("hidden");
+          } else {
+            iconOpen && iconOpen.classList.remove("hidden");
+            iconClosed && iconClosed.classList.add("hidden");
+          }
         });
+
+      (function () {
+        var c = document.body.classList.contains("sb-collapsed");
+        var sbToggle = document.getElementById("sidebar-toggle");
+        if (!sbToggle) return;
+        var iconOpen = sbToggle.querySelector(".sidebar-icon-open");
+        var iconClosed = sbToggle.querySelector(".sidebar-icon-closed");
+        if (c) {
+          iconOpen && iconOpen.classList.add("hidden");
+          iconClosed && iconClosed.classList.remove("hidden");
+        }
+      })();
 
       var deferredPrompt = null;
       var banner = document.getElementById("install-banner");
@@ -1226,7 +1586,10 @@ const HEADERS = {
     "Content-Type": "application/json",
 };
 
-const EXCLUDED_ALBUM_KEYWORDS = ["UNGGAH DOKUMENTASI"];
+function getExcludedKeywords(): string[] {
+    const raw = import.meta.env.EXCLUDED_ALBUM_KEYWORDS ?? "UNGGAH DOKUMENTASI";
+    return raw.split(",").map((k: string) => k.trim()).filter(Boolean);
+}
 
 export interface ImmichAlbum {
     id: string;
@@ -1259,7 +1622,8 @@ export interface ImmichAlbumDetail extends ImmichAlbum {
 }
 
 export function isExcludedAlbum(album: ImmichAlbum): boolean {
-    return EXCLUDED_ALBUM_KEYWORDS.some((kw) =>
+    const keywords = getExcludedKeywords();
+    return keywords.some((kw) =>
         album.albumName.toUpperCase().includes(kw.toUpperCase())
     );
 }
@@ -1317,6 +1681,7 @@ export function groupAlbumsByYear(albums: ImmichAlbum[]): { year: string; albums
         .sort((a, b) => Number(b[0]) - Number(a[0]))
         .map(([year, items]) => ({ year, albums: items }));
 }
+
 ```
 
 ---
@@ -1550,7 +1915,6 @@ const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent
 
 <script>
   const pageUrl = window.location.href;
-  const albumName = document.querySelector("h1")?.textContent?.trim() ?? "";
 
   const btnCopy = document.getElementById("btn-copy-link");
   const iconCopy = document.getElementById("icon-copy");
@@ -1616,6 +1980,7 @@ export const GET: APIRoute = async ({ url }) => {
         },
     });
 };
+
 ```
 
 ---
@@ -1654,11 +2019,6 @@ const totalPhotos = albums.reduce((s, a) => s + a.assetCount, 0);
       >
         Dokumentasi Kegiatan
       </p>
-      <!-- <h1
-        class="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--color-fg)] mb-2 leading-tight"
-      >
-        Semua kegiatan {ORG_NAME}<br />dalam satu tempat.
-      </h1> -->
       <p class="text-sm text-[var(--color-fg-muted)] leading-relaxed">
         {SITE_DESCRIPTION} &mdash; {SCHOOL_NAME}.
       </p>
@@ -1776,6 +2136,7 @@ export const GET: APIRoute = () => {
         },
     });
 };
+
 ```
 
 ---

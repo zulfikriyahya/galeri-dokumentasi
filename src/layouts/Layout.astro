@@ -16,6 +16,9 @@ const SCHOOL_NAME =
 const ORG_NAME = import.meta.env.ORG_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
 const POWERED_BY = import.meta.env.POWERED_BY ?? "ZEDLABS TEKNOLOGI INDONESIA";
 const POWERED_BY_URL = import.meta.env.POWERED_BY_URL ?? "https://zedlabs.id";
+const SOCIAL_INSTAGRAM_URL = import.meta.env.SOCIAL_INSTAGRAM_URL;
+const SOCIAL_YOUTUBE_URL = import.meta.env.SOCIAL_YOUTUBE_URL;
+const UPLOAD_URL = import.meta.env.UPLOAD_URL;
 
 const {
   title = SITE_NAME,
@@ -120,13 +123,82 @@ const year = new Date().getFullYear();
             >
               <img src="/favicon.svg" class="w-full h-full object-contain" />
             </span>
-            <span class="leading-tight truncate max-w-[160px] sm:max-w-xs"
+            <!-- <span class="leading-tight truncate max-w-[160px] sm:max-w-xs"
+              >{SITE_SHORT_NAME}</span
+            > -->
+            <span
+              class="hidden sm:inline leading-tight truncate max-w-[160px] sm:max-w-xs"
               >{SITE_SHORT_NAME}</span
             >
           </a>
         </div>
 
-        <div class="flex items-center gap-2">
+        <!-- <div class="flex items-center gap-2"> -->
+        <div class="flex items-center gap-1 sm:gap-2">
+          {
+            SOCIAL_INSTAGRAM_URL && (
+              <a
+                href={SOCIAL_INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="w-4 h-4"
+                >
+                  <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.4.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421C8.415 2.176 8.794 2.16 12 2.16zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.79-4 4-4 2.209 0 4 1.79 4 4 0 2.209-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z" />
+                </svg>
+              </a>
+            )
+          }
+          {
+            SOCIAL_YOUTUBE_URL && (
+              <a
+                href={SOCIAL_YOUTUBE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="w-4 h-4"
+                >
+                  <path d="M23.498 6.186a2.997 2.997 0 0 0-2.112-2.117C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.386.524A2.997 2.997 0 0 0 .502 6.186 31.27 31.27 0 0 0 0 12a31.27 31.27 0 0 0 .502 5.814 2.997 2.997 0 0 0 2.112 2.117c1.881.524 9.386.524 9.386.524s7.505 0 9.386-.524a2.997 2.997 0 0 0 2.112-2.117A31.27 31.27 0 0 0 24 12a31.27 31.27 0 0 0-.502-5.814zM9.75 15.568V8.432L15.818 12 9.75 15.568z" />
+                </svg>
+              </a>
+            )
+          }
+          {
+            UPLOAD_URL && (
+              <a
+                href={UPLOAD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Unggah Foto"
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border-muted)] hover:bg-[var(--color-canvas-subtle)] hover:border-[var(--color-border)] transition-all duration-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  class="w-4 h-4"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </a>
+            )
+          }
           <a
             href="https://github.com/zulfikriyahya"
             target="_blank"

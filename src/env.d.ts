@@ -9,6 +9,9 @@ interface ImportMetaEnv {
     readonly POWERED_BY: string;
     readonly POWERED_BY_URL: string;
     readonly EXCLUDED_ALBUM_KEYWORDS: string;
+    readonly SOCIAL_INSTAGRAM_URL: string;
+    readonly SOCIAL_YOUTUBE_URL: string;
+    readonly UPLOAD_URL: string;
 }
 
 interface ImportMeta {
