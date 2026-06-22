@@ -52,10 +52,19 @@ const images = assets.filter((a) => a.type === "IMAGE");
           aria-label={`Buka foto ${asset.originalFileName}`}
         >
           <img
-            data-src={getThumbnailUrl(asset.id, "thumbnail")}
+            src={i < 8 ? getThumbnailUrl(asset.id, "thumbnail") : undefined}
+            data-src={
+              i >= 8 ? getThumbnailUrl(asset.id, "thumbnail") : undefined
+            }
             alt={asset.exifInfo?.description || asset.originalFileName}
-            decoding="async"
-            class="lazy-img w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 ease-out block"
+            decoding={i < 4 ? "sync" : "async"}
+            fetchpriority={i < 2 ? "high" : "auto"}
+            width="400"
+            height="300"
+            class:list={[
+              "w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 ease-out block",
+              i >= 8 ? "lazy-grid" : "",
+            ]}
           />
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 rounded-xl" />
           <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -196,24 +205,6 @@ const images = assets.filter((a) => a.type === "IMAGE");
 </div>
 
 <script>
-  const lazyImgs = document.querySelectorAll<HTMLImageElement>(".lazy-img");
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const img = entry.target as HTMLImageElement;
-        const src = img.dataset.src;
-        if (src) {
-          img.src = src;
-          delete img.dataset.src;
-        }
-        io.unobserve(img);
-      });
-    },
-    { rootMargin: "0px 0px 300px 0px" },
-  );
-  lazyImgs.forEach((img) => io.observe(img));
-
   const lb = document.getElementById("lightbox")!;
   const lbImg = document.getElementById("lb-img") as HTMLImageElement;
   const lbName = document.getElementById("lb-name")!;
@@ -229,6 +220,26 @@ const images = assets.filter((a) => a.type === "IMAGE");
     document.querySelectorAll<HTMLButtonElement>("#photo-grid button"),
   );
   let current = 0;
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const img = entry.target as HTMLImageElement;
+        const src = img.dataset.src;
+        if (src) {
+          img.src = src;
+          delete img.dataset.src;
+        }
+        io.unobserve(img);
+      });
+    },
+    { rootMargin: "0px 0px 400px 0px" },
+  );
+
+  document
+    .querySelectorAll<HTMLImageElement>(".lazy-grid")
+    .forEach((img) => io.observe(img));
 
   function open(index: number) {
     current = index;
@@ -269,6 +280,10 @@ const images = assets.filter((a) => a.type === "IMAGE");
       const pre = new Image();
       pre.src = buttons[current + 1].dataset.src!;
     }
+    if (current - 1 >= 0) {
+      const pre = new Image();
+      pre.src = buttons[current - 1].dataset.src!;
+    }
   }
 
   buttons.forEach((btn, i) => btn.addEventListener("click", () => open(i)));
@@ -301,8 +316,7 @@ const images = assets.filter((a) => a.type === "IMAGE");
   lb.addEventListener("touchend", (e) => {
     const dx = e.changedTouches[0].clientX - startX;
     const dy = e.changedTouches[0].clientY - startY;
-    if (Math.abs(dy) > Math.abs(dx)) return;
-    if (Math.abs(dx) < 40) return;
+    if (Math.abs(dy) > Math.abs(dx) || Math.abs(dx) < 40) return;
     if (dx < 0 && current < buttons.length - 1) {
       current++;
       render();

@@ -26,7 +26,7 @@ function metaFor(asset: ImmichAsset): string {
   <div class="zigzag-row">
     <div class="zigzag-track zigzag-left">
       {
-        [...rowOne, ...rowOne].map((asset) => (
+        [...rowOne, ...rowOne].map((asset, i) => (
           <button
             type="button"
             class="slider-img-btn relative group h-28 sm:h-36 w-auto flex-shrink-0 rounded-xl overflow-hidden glossy-card cursor-zoom-in"
@@ -37,10 +37,19 @@ function metaFor(asset: ImmichAsset): string {
             aria-label={`Buka foto ${asset.originalFileName}`}
           >
             <img
-              data-src={getThumbnailUrl(asset.id, "thumbnail")}
+              src={i < 6 ? getThumbnailUrl(asset.id, "thumbnail") : undefined}
+              data-src={
+                i >= 6 ? getThumbnailUrl(asset.id, "thumbnail") : undefined
+              }
               alt={asset.exifInfo?.description || asset.originalFileName}
               decoding="async"
-              class="lazy-img h-full w-auto object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out block"
+              fetchpriority={i < 2 ? "high" : "auto"}
+              width="160"
+              height="112"
+              class:list={[
+                "h-full w-auto object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out block",
+                i >= 6 ? "lazy-slider" : "",
+              ]}
             />
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 pointer-events-none" />
           </button>
@@ -51,7 +60,7 @@ function metaFor(asset: ImmichAsset): string {
   <div class="zigzag-row">
     <div class="zigzag-track zigzag-right">
       {
-        [...rowTwo, ...rowTwo].map((asset) => (
+        [...rowTwo, ...rowTwo].map((asset, i) => (
           <button
             type="button"
             class="slider-img-btn relative group h-28 sm:h-36 w-auto flex-shrink-0 rounded-xl overflow-hidden glossy-card cursor-zoom-in"
@@ -62,10 +71,18 @@ function metaFor(asset: ImmichAsset): string {
             aria-label={`Buka foto ${asset.originalFileName}`}
           >
             <img
-              data-src={getThumbnailUrl(asset.id, "thumbnail")}
+              src={i < 6 ? getThumbnailUrl(asset.id, "thumbnail") : undefined}
+              data-src={
+                i >= 6 ? getThumbnailUrl(asset.id, "thumbnail") : undefined
+              }
               alt={asset.exifInfo?.description || asset.originalFileName}
               decoding="async"
-              class="lazy-img h-full w-auto object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out block"
+              width="160"
+              height="112"
+              class:list={[
+                "h-full w-auto object-cover pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out block",
+                i >= 6 ? "lazy-slider" : "",
+              ]}
             />
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 pointer-events-none" />
           </button>
@@ -169,27 +186,36 @@ function metaFor(asset: ImmichAsset): string {
   const btnClose = document.getElementById("slider-lb-close")!;
   const backdrop = document.getElementById("slider-lb-backdrop")!;
 
-  const lazyImgs = document.querySelectorAll<HTMLImageElement>(".lazy-img");
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const img = entry.target as HTMLImageElement;
-        const src = img.dataset.src;
-        if (src) {
-          img.src = src;
-          delete img.dataset.src;
-        }
-        io.unobserve(img);
-      });
-    },
-    { rootMargin: "0px 200px 0px 200px" },
-  );
-  lazyImgs.forEach((img) => io.observe(img));
+  function loadSliderImages() {
+    const lazys = document.querySelectorAll<HTMLImageElement>(".lazy-slider");
+    if (!lazys.length) return;
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(() => batchLoad(lazys), { timeout: 1200 });
+    } else {
+      setTimeout(() => batchLoad(lazys), 300);
+    }
+  }
 
-  const buttons = Array.from(
-    document.querySelectorAll<HTMLButtonElement>(".slider-img-btn"),
-  );
+  function batchLoad(imgs: NodeListOf<HTMLImageElement>) {
+    let i = 0;
+    function next() {
+      if (i >= imgs.length) return;
+      const img = imgs[i++];
+      const src = img.dataset.src;
+      if (src) {
+        img.src = src;
+        delete img.dataset.src;
+      }
+      if (i < imgs.length) requestAnimationFrame(next);
+    }
+    next();
+  }
+
+  if (document.readyState === "complete") {
+    loadSliderImages();
+  } else {
+    window.addEventListener("load", loadSliderImages, { once: true });
+  }
 
   const tracks = Array.from(
     document.querySelectorAll<HTMLElement>(".zigzag-track"),
@@ -208,7 +234,11 @@ function metaFor(asset: ImmichAsset): string {
     track.addEventListener("pointerleave", resume);
   });
 
-  function open(btn: HTMLButtonElement) {
+  const buttons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>(".slider-img-btn"),
+  );
+
+  function openLightbox(btn: HTMLButtonElement) {
     lb.classList.remove("hidden");
     document.body.style.overflow = "hidden";
     lbImg.style.opacity = "0";
@@ -225,17 +255,19 @@ function metaFor(asset: ImmichAsset): string {
     lbDl.download = btn.dataset.name!;
   }
 
-  function close() {
+  function closeLightbox() {
     lb.classList.add("hidden");
     document.body.style.overflow = "";
   }
 
-  buttons.forEach((btn) => btn.addEventListener("click", () => open(btn)));
-  btnClose.addEventListener("click", close);
-  backdrop.addEventListener("click", close);
+  buttons.forEach((btn) =>
+    btn.addEventListener("click", () => openLightbox(btn)),
+  );
+  btnClose.addEventListener("click", closeLightbox);
+  backdrop.addEventListener("click", closeLightbox);
 
   document.addEventListener("keydown", (e) => {
     if (lb.classList.contains("hidden")) return;
-    if (e.key === "Escape") close();
+    if (e.key === "Escape") closeLightbox();
   });
 </script>
