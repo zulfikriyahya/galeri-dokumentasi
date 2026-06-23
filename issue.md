@@ -18,7 +18,7 @@
 - Gambar ketika diklik memunculkan Lightbox (diperindah, cepat, dan responsif)
 - Responsif (Smartphone First)
 - Font Family: Lexend
-- Tampilan lebih proporsional, simetris, dan elegan (perbaiki menu pada tampilan smartphone) — *perlu implementasi*
+- Tampilan lebih proporsional, simetris, dan elegan (perbaiki menu pada tampilan smartphone)
 - Dijadikan PWA dan dapat diinstall (popup permintaan install)
 - Caching data agar cepat ketika load gambar
 - Glassmorphism
