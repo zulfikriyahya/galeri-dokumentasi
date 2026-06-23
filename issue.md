@@ -32,4 +32,8 @@
 -
 
 ## Issue
-- 
+- Luluskan Semua Aspek Pada Mobile dan Desktop dengan Skor 100 Pada PageSpeed Insights
+  - Performa
+  - Aksesibilitas
+  - Praktik Terbaik
+  - SEO
