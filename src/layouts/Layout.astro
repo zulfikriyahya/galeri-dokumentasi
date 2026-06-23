@@ -1,6 +1,12 @@
 ---
 import "../styles/global.css";
 
+import "@fontsource/lexend/300.css";
+import "@fontsource/lexend/400.css";
+import "@fontsource/lexend/500.css";
+import "@fontsource/lexend/600.css";
+import "@fontsource/lexend/700.css";
+
 interface Props {
   title?: string;
   description?: string;
@@ -13,8 +19,7 @@ const SITE_NAME = import.meta.env.SITE_NAME ?? "GALERI DOKUMENTASI";
 const SITE_SHORT_NAME = import.meta.env.SITE_SHORT_NAME ?? "DOKUMENTASI";
 const SITE_DESCRIPTION =
   import.meta.env.SITE_DESCRIPTION ?? "Dokumentasi kegiatan dalam satu tempat.";
-const SCHOOL_NAME =
-  import.meta.env.SCHOOL_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
+const SCHOOL_NAME = import.meta.env.SCHOOL_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
 const ORG_NAME = import.meta.env.ORG_NAME ?? "ZEDLABS TEKNOLOGI INDONESIA";
 const POWERED_BY = import.meta.env.POWERED_BY ?? "ZEDLABS TEKNOLOGI INDONESIA";
 const POWERED_BY_URL = import.meta.env.POWERED_BY_URL ?? "https://zedlabs.id";
@@ -23,10 +28,8 @@ const SOCIAL_YOUTUBE_URL = import.meta.env.SOCIAL_YOUTUBE_URL;
 const UPLOAD_URL = import.meta.env.UPLOAD_URL;
 
 const DEVELOPER_NAME = import.meta.env.DEVELOPER_NAME ?? "Yahya Zulfikri";
-const DEVELOPER_ROLE =
-  import.meta.env.DEVELOPER_ROLE ?? "Staf Tata Usaha & IT Madrasah";
-const DEVELOPER_URL =
-  import.meta.env.DEVELOPER_URL ?? "https://github.com/zulfikriyahya";
+const DEVELOPER_ROLE = import.meta.env.DEVELOPER_ROLE ?? "Staf Tata Usaha & IT Madrasah";
+const DEVELOPER_URL = import.meta.env.DEVELOPER_URL ?? "https://github.com/zulfikriyahya";
 const DEVELOPER_INSTAGRAM_URL = import.meta.env.DEVELOPER_INSTAGRAM_URL;
 const DEVELOPER_LINKEDIN_URL = import.meta.env.DEVELOPER_LINKEDIN_URL;
 
@@ -54,11 +57,7 @@ const developerPerson = {
   name: DEVELOPER_NAME,
   jobTitle: DEVELOPER_ROLE,
   url: DEVELOPER_URL,
-  sameAs: [
-    DEVELOPER_URL,
-    DEVELOPER_INSTAGRAM_URL,
-    DEVELOPER_LINKEDIN_URL,
-  ].filter(Boolean),
+  sameAs: [DEVELOPER_URL, DEVELOPER_INSTAGRAM_URL, DEVELOPER_LINKEDIN_URL].filter(Boolean),
   worksFor: {
     "@type": "EducationalOrganization",
     name: SCHOOL_NAME,
@@ -83,16 +82,8 @@ const websiteJsonLd = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta
-      name="theme-color"
-      content="#0969da"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#0d1117"
-      media="(prefers-color-scheme: dark)"
-    />
+    <meta name="theme-color" content="#0969da" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={resolvedOgImage} />
@@ -111,10 +102,7 @@ const websiteJsonLd = {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="author" content={DEVELOPER_NAME} />
     <title>{title}</title>
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify(websiteJsonLd)}
-    />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
     <script is:inline>
       (function () {
         var s = localStorage.getItem("theme");
@@ -127,9 +115,7 @@ const websiteJsonLd = {
     </script>
   </head>
 
-  <body
-    class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen antialiased"
-  >
+  <body class="bg-[var(--color-canvas)] text-[var(--color-fg)] min-h-screen antialiased">
     <slot name="sidebar" />
 
     <div id="app-content" class="flex flex-col min-h-screen">
@@ -151,8 +137,7 @@ const websiteJsonLd = {
               stroke-width="2"
               class="w-4 h-4 sidebar-icon-open"
             >
-              <rect x="3" y="3" width="7" height="18" rx="1.5" opacity="0.3"
-              ></rect>
+              <rect x="3" y="3" width="7" height="18" rx="1.5" opacity="0.3"></rect>
               <line x1="14" y1="7" x2="21" y2="7"></line>
               <line x1="14" y1="12" x2="21" y2="12"></line>
               <line x1="14" y1="17" x2="21" y2="17"></line>
@@ -165,8 +150,7 @@ const websiteJsonLd = {
               stroke-width="2"
               class="w-4 h-4 sidebar-icon-closed hidden"
             >
-              <rect x="14" y="3" width="7" height="18" rx="1.5" opacity="0.3"
-              ></rect>
+              <rect x="14" y="3" width="7" height="18" rx="1.5" opacity="0.3"></rect>
               <line x1="3" y1="7" x2="10" y2="7"></line>
               <line x1="3" y1="12" x2="10" y2="12"></line>
               <line x1="3" y1="17" x2="10" y2="17"></line>
@@ -182,9 +166,7 @@ const websiteJsonLd = {
             >
               <img src="/favicon.svg" class="w-full h-full object-contain" />
             </span>
-            <span class="leading-tight truncate max-w-[160px] sm:max-w-xs"
-              >{SITE_SHORT_NAME}</span
-            >
+            <span class="leading-tight truncate max-w-[160px] sm:max-w-xs">{SITE_SHORT_NAME}</span>
             <!-- <span
               class="hidden sm:inline leading-tight truncate max-w-[160px] sm:max-w-xs"
               >{SITE_SHORT_NAME}</span
@@ -317,9 +299,7 @@ const websiteJsonLd = {
         <slot />
       </main>
 
-      <footer
-        class="hidden lg:block px-6 py-4 border-t border-[var(--color-border-muted)]"
-      >
+      <footer class="hidden lg:block px-6 py-4 border-t border-[var(--color-border-muted)]">
         <div
           class="flex flex-col sm:flex-row items-center justify-between gap-1.5 text-xs text-[var(--color-fg-subtle)]"
         >
@@ -375,8 +355,7 @@ const websiteJsonLd = {
             stroke-width="2"
             class="w-[22px] h-[22px]"
           >
-            <path
-              d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
             ></path>
           </svg>
           <span>Album</span>
@@ -400,9 +379,7 @@ const websiteJsonLd = {
             <img src="/favicon.svg" class="w-full h-full object-contain" />
           </span>
           <div>
-            <p
-              class="text-sm font-semibold text-[var(--color-fg)] leading-tight"
-            >
+            <p class="text-sm font-semibold text-[var(--color-fg)] leading-tight">
               Install Aplikasi
             </p>
             <p class="text-xs text-[var(--color-fg-muted)] mt-0.5">
@@ -426,12 +403,10 @@ const websiteJsonLd = {
     </div>
 
     <script is:inline>
-      document
-        .getElementById("theme-toggle")
-        .addEventListener("click", function () {
-          var isDark = document.documentElement.classList.toggle("dark");
-          localStorage.setItem("theme", isDark ? "dark" : "light");
-        });
+      document.getElementById("theme-toggle").addEventListener("click", function () {
+        var isDark = document.documentElement.classList.toggle("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+      });
 
       var sbToggle = document.getElementById("sidebar-toggle");
       sbToggle &&
@@ -473,8 +448,7 @@ const websiteJsonLd = {
         banner.style.pointerEvents = "auto";
       }
       function hideBanner() {
-        banner.style.transform =
-          "translateX(-50%) translateY(calc(100% + 1.5rem))";
+        banner.style.transform = "translateX(-50%) translateY(calc(100% + 1.5rem))";
         banner.style.opacity = "0";
         banner.style.pointerEvents = "none";
       }
